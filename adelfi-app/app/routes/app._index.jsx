@@ -13,12 +13,18 @@ import {
   Divider,
   List,
   Link,
+  LegacyCard,
+  DataTable
 } from "@shopify/polaris";
 
 import { authenticate } from "../shopify.server";
 
-const numDiscounts = 100;
-
+const numDiscounts = 10000;
+const percentOff = 0.25;
+const usageLimit = 5;
+const endDate = "2023-11-28T12:00:00Z";
+const endDateFormatted = (new Date(endDate)).toDateString();
+const commissionRate = 0.1;
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
@@ -79,13 +85,13 @@ export async function action({ request }) {
           "title": "25% off with Adelfi",
           "code": "Adelfi-2023",
           "startsAt": "2023-09-28T12:00:00Z",
-          "endsAt": "2023-11-28T12:00:00Z",
+          "endsAt": endDate,
           "customerSelection": {
             "all": true
           },
           "customerGets": {
             "value": {
-              "percentage": 0.25
+              "percentage": percentOff
             },
             "items": {
               "all": true
@@ -99,37 +105,103 @@ export async function action({ request }) {
 
   const responseJson = await response.json();
 
-  let codes = []
-    for (let i = 0; i < numDiscounts - 1; i++) {
-      codes[i] = {"code": "Adelfi-" + (Math.random() * 10000)}
+  let remainingDiscounts = numDiscounts - 1
+
+  while (remainingDiscounts > 0) {
+    let codes = []
+    for (let i = 0; i < 100; i++) {
+      if (remainingDiscounts > 0) {
+        codes[i] = {"code": "Adelfi-" + makeCode(9)}
+        remainingDiscounts--;
+      }
     }
 
-  await admin.graphql(
-    `#graphql
-      mutation discountRedeemCodeBulkAdd($discountId: ID!, $codes: [DiscountRedeemCodeInput!]!) {
-        discountRedeemCodeBulkAdd(discountId: $discountId, codes: $codes) {
-          bulkCreation {
-            id
+    await admin.graphql(
+      `#graphql
+        mutation discountRedeemCodeBulkAdd($discountId: ID!, $codes: [DiscountRedeemCodeInput!]!) {
+          discountRedeemCodeBulkAdd(discountId: $discountId, codes: $codes) {
+            bulkCreation {
+              id
+            }
+            userErrors {
+              code
+              field
+              message
+            }
           }
-          userErrors {
-            code
-            field
-            message
-          }
-        }
-      }`,
-    {
-      variables: {
-        "discountId": await responseJson.data.discountCodeBasicCreate.codeDiscountNode.id,
-        "codes": codes
-      },
-    }
-  );
+        }`,
+      {
+        variables: {
+          "discountId": await responseJson.data.discountCodeBasicCreate.codeDiscountNode.id,
+          "codes": codes
+        },
+      }
+    );
+  }
 
   return json({
     discount: responseJson.data.discountCodeBasicCreate.codeDiscountNode,
   });
 
+}
+
+function makeCode(length) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+function DiscountDetailsTable() {
+  const rows = [
+    [numDiscounts, percentOff, usageLimit, commissionRate, endDateFormatted],
+  ];
+
+  return (
+    <Page title="Discount Details">
+      <LegacyCard>
+        <DataTable
+          columnContentTypes={[
+            'numeric',
+            'numeric',
+            'numeric',
+            'numeric',
+            'text',
+          ]}
+          headings={[
+            'Number of Codes',
+            'Percent Discount',
+            'Usage Limit',
+            'Commission Rate',
+            'Renewal Date',
+          ]}
+          rows={rows}
+        />
+      </LegacyCard>
+    </Page>
+  );
+}
+
+function StyledBox({ children }) {
+  return (
+    <Box
+      as="span"
+      padding="025"
+      paddingInlineStart="1"
+      paddingInlineEnd="1"
+      background="bg-subdued"
+      borderWidth="1"
+      borderColor="border"
+      borderRadius="1"
+    >
+      <code>{children}</code>
+    </Box>
+  );
 }
 
 export default function Index() {
@@ -178,15 +250,14 @@ export default function Index() {
                     <Text as="h3" variant="headingMd">
                       Discount
                     </Text>
+                    <DiscountDetailsTable />
+                  </VerticalStack>
+                  <VerticalStack gap="2">
+                    <Text as="h3" variant="headingMd">
+                      Terms
+                    </Text>
                     <Text as="p" variant="bodyMd">
-                      Placeholder Text. {" "}
-                      <Link
-                        url="https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate"
-                        target="_blank"
-                      >
-                        productCreate
-                      </Link>{" "}
-                      mutation in our API references.
+                      Once all of the discount codes are generated, they will be sent directly to our marketing team at Adelfi for distribution.
                     </Text>
                   </VerticalStack>
                   <HorizontalStack gap="3" align="end">
@@ -216,15 +287,6 @@ export default function Index() {
                       </pre>
                     </Box>
                   )}
-                </VerticalStack>
-              </Card>
-              <Card>
-              <VerticalStack gap="5">
-                  <VerticalStack gap="2">
-                    <Text as="h2" variant="headingMd">
-                      Text
-                    </Text>
-                  </VerticalStack>
                 </VerticalStack>
               </Card>
             </VerticalStack>
