@@ -20,10 +20,10 @@ import {
 
 import { authenticate } from "../shopify.server";
 
-const numDiscounts = 10000;
+const numDiscounts = 1000;
 const percentOff = 0.25;
 const discountTitle = Math.round(percentOff * 100) + "% off with Adelfi"
-const usageLimit = 5;
+const usageLimit = 3;
 const endDate = "2023-11-28T12:00:00Z";
 const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
 const commissionRate = 0.1;
@@ -49,7 +49,7 @@ export async function action({ request }) {
 
   const discountId = await discountJson.data.discountCodeBasicCreate.codeDiscountNode.id
 
-  const responses = await generateBulkDiscountCodes(admin, codeSets, discountId);
+  const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
   return json({
     discount: discountJson.data.discountCodeBasicCreate.codeDiscountNode,
@@ -101,7 +101,7 @@ function makeCode(length) {
 
 function DiscountDetailsTable() {
   const rows = [
-    [discountTitle, numDiscounts, percentOff, usageLimit, commissionRate, endDateFormatted],
+    [discountTitle, numDiscounts, Math.floor(percentOff * 100) + "%", usageLimit, commissionRate, endDateFormatted],
   ];
 
   return (
@@ -114,12 +114,12 @@ function DiscountDetailsTable() {
             'numeric',
             'numeric',
             'numeric',
-            'text',
+            'numeric',
           ]}
           headings={[
             'Discount Title',
             'Number of Codes',
-            'Percent Discount',
+            'Percent Off',
             'Usage Limit',
             'Commission Rate',
             'Renewal Date',
@@ -286,7 +286,7 @@ export default function Index() {
                   </Text>
                   <List spacing="extraTight">
                     <List.Item>
-                      Ask us about additional sorority partnership {" "}
+                      Ask us about our additional sorority partnership {" "}
                       <Link
                         url="mailto:kellsworth@adelfi.shop"
                         target="_blank"
@@ -329,6 +329,7 @@ async function createDiscount(admin, myCode) {
                     code
                   }
                 }
+                usageLimit
                 startsAt
                 endsAt
                 customerSelection {
@@ -377,7 +378,8 @@ async function createDiscount(admin, myCode) {
               "all": true
             }
           },
-          "appliesOncePerCustomer": true
+          "appliesOncePerCustomer": false,
+          "usageLimit": usageLimit
         }
       },
     }
@@ -422,4 +424,11 @@ async function generateBulkDiscountCodes(admin, codeSets, discountId) {
   }
 
   return responses
+}
+
+function arrayToTextFile(data) {
+  const textContent = data.join(',');
+  const blob = new Blob([textContent], { type: 'text/plain'});
+
+  return blob;
 }
