@@ -27,6 +27,7 @@ const usageLimit = 5;
 const endDate = "2023-11-28T12:00:00Z";
 const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
 const commissionRate = 0.1;
+const codePrefix = "Adelfi-"
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
@@ -36,115 +37,54 @@ export const loader = async ({ request }) => {
 
 export async function action({ request }) {
   const { admin } = await authenticate.admin(request);
+  const codeLength = 9
 
-  const response = await admin.graphql(
-    `#graphql
-      mutation discountCodeBasicCreate($basicCodeDiscount: DiscountCodeBasicInput!) {
-        discountCodeBasicCreate(basicCodeDiscount: $basicCodeDiscount) {
-          codeDiscountNode {
-            id
-            codeDiscount {
-              ... on DiscountCodeBasic {
-                title
-                codes(first: 10) {
-                  nodes {
-                    code
-                  }
-                }
-                startsAt
-                endsAt
-                customerSelection {
-                  ... on DiscountCustomerAll {
-                    allCustomers
-                  }
-                }
-                customerGets {
-                  value {
-                    ... on DiscountPercentage {
-                      percentage
-                    }
-                  }
-                  items {
-                    ... on AllDiscountItems {
-                      allItems
-                    }
-                  }
-                }
-                appliesOncePerCustomer
-              }
-            }
-          }
-          userErrors {
-            field
-            code
-            message
-          }
-        }
-      }`,
-    {
-      variables: {
-        "basicCodeDiscount": {
-          "title": "25% off with Adelfi",
-          "code": "Adelfi-2023",
-          "startsAt": "2023-09-28T12:00:00Z",
-          "endsAt": endDate,
-          "customerSelection": {
-            "all": true
-          },
-          "customerGets": {
-            "value": {
-              "percentage": percentOff
-            },
-            "items": {
-              "all": true
-            }
-          },
-          "appliesOncePerCustomer": true
-        }
-      },
-    }
-  );
+  const codesArray = generateCodesArray(numDiscounts, codeLength)
 
-  const responseJson = await response.json();
+  const firstCode = codesArray.pop()
 
-  let remainingDiscounts = numDiscounts - 1
+  const codeSets = generateCodes(codesArray)
 
-  while (remainingDiscounts > 0) {
-    let codes = []
-    for (let i = 0; i < 100; i++) {
-      if (remainingDiscounts > 0) {
-        codes[i] = {"code": "Adelfi-" + makeCode(9)}
-        remainingDiscounts--;
-      }
-    }
+  const discountJson = await createDiscount(admin, firstCode.code);
 
-    await admin.graphql(
-      `#graphql
-        mutation discountRedeemCodeBulkAdd($discountId: ID!, $codes: [DiscountRedeemCodeInput!]!) {
-          discountRedeemCodeBulkAdd(discountId: $discountId, codes: $codes) {
-            bulkCreation {
-              id
-            }
-            userErrors {
-              code
-              field
-              message
-            }
-          }
-        }`,
-      {
-        variables: {
-          "discountId": await responseJson.data.discountCodeBasicCreate.codeDiscountNode.id,
-          "codes": codes
-        },
-      }
-    );
-  }
+  const discountId = await discountJson.data.discountCodeBasicCreate.codeDiscountNode.id
+
+  const responses = await generateBulkDiscountCodes(admin, codeSets, discountId);
 
   return json({
-    discount: responseJson.data.discountCodeBasicCreate.codeDiscountNode,
+    discount: discountJson.data.discountCodeBasicCreate.codeDiscountNode,
+    codeSets: codeSets,
+    bulkAddCodesResponses: responses
   });
+}
 
+function generateCodesArray(numberOfCodes, codeLength) {
+  const codes = new Set()
+
+  while (codes.size < numberOfCodes) {
+    codes.add({code: codePrefix + makeCode(codeLength)})
+  }
+
+  return Array.from(codes)
+}
+
+function generateCodes(codesArray) {
+
+  const setCount = Math.ceil(codesArray.length / 100)
+  const codeSets = [];
+
+  for (let i = 0; i < setCount - 1; i++) {
+    const startIndex = i * 100;
+    const endIndex = (i + 1) * 100;
+    const codeSet = codesArray.slice(startIndex, endIndex)
+    codeSets.push(codeSet)
+  }
+
+  const lastIndex = setCount - 1;
+  const lastSet = codesArray.slice(lastIndex * 100);
+  codeSets.push(lastSet);
+
+  return codeSets;
 }
 
 function makeCode(length) {
@@ -373,3 +313,113 @@ export default function Index() {
     </Page>
   );
 };
+
+async function createDiscount(admin, myCode) {
+  const response = await admin.graphql(
+    `#graphql
+      mutation discountCodeBasicCreate($basicCodeDiscount: DiscountCodeBasicInput!) {
+        discountCodeBasicCreate(basicCodeDiscount: $basicCodeDiscount) {
+          codeDiscountNode {
+            id
+            codeDiscount {
+              ... on DiscountCodeBasic {
+                title
+                codes(first: 10) {
+                  nodes {
+                    code
+                  }
+                }
+                startsAt
+                endsAt
+                customerSelection {
+                  ... on DiscountCustomerAll {
+                    allCustomers
+                  }
+                }
+                customerGets {
+                  value {
+                    ... on DiscountPercentage {
+                      percentage
+                    }
+                  }
+                  items {
+                    ... on AllDiscountItems {
+                      allItems
+                    }
+                  }
+                }
+                appliesOncePerCustomer
+              }
+            }
+          }
+          userErrors {
+            field
+            code
+            message
+          }
+        }
+      }`,
+    {
+      variables: {
+        "basicCodeDiscount": {
+          "title": "25% off with Adelfi",
+          "code": myCode,
+          "startsAt": "2023-09-28T12:00:00Z",
+          "endsAt": endDate,
+          "customerSelection": {
+            "all": true
+          },
+          "customerGets": {
+            "value": {
+              "percentage": percentOff
+            },
+            "items": {
+              "all": true
+            }
+          },
+          "appliesOncePerCustomer": true
+        }
+      },
+    }
+  );
+
+  const responseJson = await response.json();
+
+  return responseJson;
+}
+
+async function generateBulkDiscountCodes(admin, codeSets, discountId) {
+  const responses = []
+
+  while (responses.length < codeSets.length) {
+    const codes = codeSets[responses.length]
+
+    const response = await admin.graphql(
+      `#graphql
+        mutation discountRedeemCodeBulkAdd($discountId: ID!, $codes: [DiscountRedeemCodeInput!]!) {
+          discountRedeemCodeBulkAdd(discountId: $discountId, codes: $codes) {
+            bulkCreation {
+              id
+            }
+            userErrors {
+              code
+              field
+              message
+            }
+          }
+        }`,
+      {
+        variables: {
+          "discountId": discountId,
+          "codes": codes
+        },
+      }
+    ); 
+    const responseJson = await response.json()
+    if (responseJson.data.discountRedeemCodeBulkAdd.bulkCreation != null) {
+      responses.push(responseJson)
+    }
+  }
+
+  return responses
+}
