@@ -20,3 +20,19 @@ model Session {
   accessToken String
   userId      BigInt?
 }
+
+model Partnership {
+  id          String    @id
+  shop        String
+  discountId  String?
+  title       String
+  isActive    Boolean   @default(false)
+  usageLimit  Int
+  percentOff  Float
+  expires     DateTime?
+  autoRenew   Boolean   @default(false)
+  commission  Float
+  codes       Bytes?
+  uses        String
+  userId      BigInt?
+}

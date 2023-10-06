@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "adelfi-app"
+client_id = "5e08fea9e792973c455f4c456965173a"
+application_url = "https://valid-dropped-sum-bracket.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_discounts"
+
+[auth]
+redirect_urls = [
+  "https://valid-dropped-sum-bracket.trycloudflare.com/auth/callback",
+  "https://valid-dropped-sum-bracket.trycloudflare.com/auth/shopify/callback",
+  "https://valid-dropped-sum-bracket.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-10"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "quickstart-9f306b3f.myshopify.com"

@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "adelfi-app"
+client_id = "00040b8773e87aa506278df0114b338b"
+application_url = "https://adelaide-explaining-dude-apparatus.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_discounts"
+
+[auth]
+redirect_urls = [
+  "https://adelaide-explaining-dude-apparatus.trycloudflare.com/auth/callback",
+  "https://adelaide-explaining-dude-apparatus.trycloudflare.com/auth/shopify/callback",
+  "https://adelaide-explaining-dude-apparatus.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-10"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "quickstart-9f306b3f.myshopify.com"
