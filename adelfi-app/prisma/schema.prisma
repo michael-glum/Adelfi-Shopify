@@ -33,6 +33,7 @@ model Partnership {
   autoRenew   Boolean   @default(false)
   commission  Float
   codes       Bytes?
-  uses        String
+  totalSales  Float?
+  currency    String?
   userId      BigInt?
 }

@@ -37,7 +37,7 @@ export const loader = async ({ request }) => {
   const partnership = await getPartnership(session.shop, admin.graphql)
 
   return json({
-    partnership
+    partnership,
   });
 };
 
@@ -187,7 +187,8 @@ export default function Index() {
   return (
     <Page>
       <ui-title-bar title="Adelfi">
-        <button variant="primary" onClick={generateDiscount}>
+        <></>
+        <button variant="primary" onClick={generateDiscount} disabled={partnership.discountId != null}>
           Activate Partnership
         </button>
       </ui-title-bar>
@@ -229,7 +230,7 @@ export default function Index() {
                         View Discount
                       </Button>
                     )}
-                    <Button loading={isLoading} primary onClick={generateDiscount}>
+                    <Button loading={isLoading} primary onClick={generateDiscount} disabled={partnership.discountId != null}>
                       Activate Partnership
                     </Button>
                   </HorizontalStack>
@@ -247,6 +248,49 @@ export default function Index() {
                       </pre>
                     </Box>
                   )}
+                  {partnership.discountId != null ? (
+                    <VerticalStack gap="2">
+                      <Text as="h3" variant="headingMd">
+                        Usage
+                      </Text>
+                      <HorizontalStack gap="3" align="center">
+                        <Box
+                          padding="4"
+                          background="bg-subdued"
+                          borderColor="border"
+                          borderWidth="1"
+                          borderRadius="2"
+                          width="25%"
+                        >
+                          <VerticalStack gap="2">
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              Total Sales
+                            </Text>
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
+                            </Text>
+                          </VerticalStack>
+                        </Box>
+                        <Box
+                          padding="4"
+                          background="bg-subdued"
+                          borderColor="border"
+                          borderWidth="1"
+                          borderRadius="2"
+                          width="25%"
+                        >
+                          <VerticalStack gap="2">
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              Commissions Owed
+                            </Text>
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
+                            </Text>
+                          </VerticalStack>
+                        </Box>
+                      </HorizontalStack>
+                    </VerticalStack>
+                  ) : (<></>)}
                   <VerticalStack gap="2">
                     <Text as="h3" variant="headingMd">
                       Terms
