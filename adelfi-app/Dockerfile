@@ -4,6 +4,18 @@ EXPOSE 3000
 WORKDIR /app
 COPY . .
 
+ARG LITEFS_CONFIG=litefs.yml
+
+COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
+
+ADD etc/litefs.yml /tmp/litefs.yml
+
+RUN cp /tmp/$LITEFS_CONFIG /etc/litefs.yml
+
+RUN apk add bash fuse3 sqlite  ca-certificates curl
+
+ENTRYPOINT litefs mount
+
 RUN npm install
 RUN npm run build
 

@@ -162,232 +162,354 @@ export default function Index() {
   const submit = useSubmit();
   const loaderData = useLoaderData();
   const partnership = loaderData?.partnership
+
+  if (partnership != null) {
   
-  const title = partnership?.title
-  const percentOff = partnership?.percentOff
-  const usageLimit = partnership?.usageLimit
-  const commission = partnership?.commission
+    const title = partnership?.title
+    const percentOff = partnership?.percentOff
+    const usageLimit = partnership?.usageLimit
+    const commission = partnership?.commission
 
-  const isLoading =
-    ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
+    const isLoading =
+      ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
 
-  const discountId = actionData?.discount?.id.replace(
-    "gid://shopify/DiscountCodeNode/",
-    ""
-  );
+    const discountId = actionData?.discount?.id.replace(
+      "gid://shopify/DiscountCodeNode/",
+      ""
+    );
 
-  useEffect(() => {
-    if (discountId) {
-      shopify.toast.show("Discount created");
-    }
-  }, [discountId]);
+    useEffect(() => {
+      if (discountId) {
+        shopify.toast.show("Discount created");
+      }
+    }, [discountId]);
 
-  const generateDiscount = () => submit({}, { replace: true, method: "POST" });
+    const generateDiscount = () => submit({}, { replace: true, method: "POST" });
 
-  return (
-    <Page>
-      <ui-title-bar title="Adelfi">
-        <></>
-        <button variant="primary" onClick={generateDiscount} disabled={partnership.discountId != null}>
-          Activate Partnership
-        </button>
-      </ui-title-bar>
-      <VerticalStack gap="5">
-        <Layout>
-          <Layout.Section>
-            <VerticalStack gap="5">
-              <Card>
-                <VerticalStack gap="5">
-                  <VerticalStack gap="2">
-                    <Text as="h2" variant="headingMd">
-                      Congrats on partnering with Adelfi 🎉
-                    </Text>
-                    <Text variant="bodyMd" as="p">
-                      We're thrilled to have you on board!
-                    </Text>
-                  </VerticalStack>
-                  <VerticalStack gap="2">
-                    <Text as="h3" variant="headingMd">
-                      Partnership Details
-                    </Text>
-                    <DiscountDetailsTable title={title} percentOff={percentOff} usageLimit={usageLimit} commission={commission}/>
-                    <Text as="p" variant="bodyMd" alignment="center">
-                      All codes are generated automatically and sent to our marketing team at Adelfi for distribution.
-                    </Text>
-                    <Text as="p" variant="bodyMd" alignment="center">
-                      Number of Codes is subject to increase at any time due to rising demand. 
-                    </Text>
-                    <Text as="p" variant="bodyMd" alignment="center">
-                      Clicking "Activate Partnership" will begin the generation process.
-                    </Text>
-                  </VerticalStack>
-                  <HorizontalStack gap="3" align="center">
-                    {actionData?.discount && (
-                      <Button
-                        url={`shopify:admin/discounts/${discountId}`}
-                        target="_blank"
-                      >
-                        View Discount
-                      </Button>
-                    )}
-                    <Button loading={isLoading} primary onClick={generateDiscount} disabled={partnership.discountId != null}>
-                      Activate Partnership
-                    </Button>
-                  </HorizontalStack>
-                  {actionData?.discount && (
-                    <Box
-                      padding="4"
-                      background="bg-subdued"
-                      borderColor="border"
-                      borderWidth="1"
-                      borderRadius="2"
-                      overflowX="scroll"
-                    >
-                      <pre style={{ margin: 0 }}>
-                        <code>{JSON.stringify(actionData.discount, null, 2)}</code>
-                      </pre>
-                    </Box>
-                  )}
-                  {partnership.discountId != null ? (
+    return (
+      <Page>
+        <ui-title-bar title="Adelfi">
+          <></>
+          <button variant="primary" onClick={generateDiscount} disabled={partnership.discountId != null}>
+            Activate Partnership
+          </button>
+        </ui-title-bar>
+        <VerticalStack gap="5">
+          <Layout>
+            <Layout.Section>
+              <VerticalStack gap="5">
+                <Card>
+                  <VerticalStack gap="5">
+                    <VerticalStack gap="2">
+                      <Text as="h2" variant="headingMd">
+                        Congrats on partnering with Adelfi 🎉
+                      </Text>
+                      <Text variant="bodyMd" as="p">
+                        We're thrilled to have you on board!
+                      </Text>
+                    </VerticalStack>
                     <VerticalStack gap="2">
                       <Text as="h3" variant="headingMd">
-                        Usage
+                        Partnership Details
                       </Text>
-                      <HorizontalStack gap="3" align="center">
-                        <Box
-                          padding="4"
-                          background="bg-subdued"
-                          borderColor="border"
-                          borderWidth="1"
-                          borderRadius="2"
-                          width="25%"
+                      <DiscountDetailsTable title={title} percentOff={percentOff} usageLimit={usageLimit} commission={commission}/>
+                      <Text as="p" variant="bodyMd" alignment="center">
+                        All codes are generated automatically and sent to our marketing team at Adelfi for distribution.
+                      </Text>
+                      <Text as="p" variant="bodyMd" alignment="center">
+                        Number of Codes is subject to increase at any time due to rising demand. 
+                      </Text>
+                      <Text as="p" variant="bodyMd" alignment="center">
+                        Clicking "Activate Partnership" will begin the generation process.
+                      </Text>
+                    </VerticalStack>
+                    <HorizontalStack gap="3" align="center">
+                      {actionData?.discount && (
+                        <Button
+                          url={`shopify:admin/discounts/${discountId}`}
+                          target="_blank"
                         >
-                          <VerticalStack gap="2">
-                            <Text as="h1" variant="headingMd" alignment="center">
-                              Total Sales
-                            </Text>
-                            <Text as="h1" variant="headingMd" alignment="center">
-                              ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
-                            </Text>
-                          </VerticalStack>
-                        </Box>
-                        <Box
-                          padding="4"
-                          background="bg-subdued"
-                          borderColor="border"
-                          borderWidth="1"
-                          borderRadius="2"
-                          width="25%"
-                        >
-                          <VerticalStack gap="2">
-                            <Text as="h1" variant="headingMd" alignment="center">
-                              Commissions Owed
-                            </Text>
-                            <Text as="h1" variant="headingMd" alignment="center">
-                              ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
-                            </Text>
-                          </VerticalStack>
-                        </Box>
+                          View Discount
+                        </Button>
+                      )}
+                      <Button loading={isLoading} primary onClick={generateDiscount} disabled={partnership.discountId != null}>
+                        Activate Partnership
+                      </Button>
+                    </HorizontalStack>
+                    {actionData?.discount && (
+                      <Box
+                        padding="4"
+                        background="bg-subdued"
+                        borderColor="border"
+                        borderWidth="1"
+                        borderRadius="2"
+                        overflowX="scroll"
+                      >
+                        <pre style={{ margin: 0 }}>
+                          <code>{JSON.stringify(actionData.discount, null, 2)}</code>
+                        </pre>
+                      </Box>
+                    )}
+                    {partnership.discountId != null ? (
+                      <VerticalStack gap="2">
+                        <Text as="h3" variant="headingMd">
+                          Usage
+                        </Text>
+                        <HorizontalStack gap="3" align="center">
+                          <Box
+                            padding="4"
+                            background="bg-subdued"
+                            borderColor="border"
+                            borderWidth="1"
+                            borderRadius="2"
+                            width="25%"
+                          >
+                            <VerticalStack gap="2">
+                              <Text as="h1" variant="headingMd" alignment="center">
+                                Total Sales
+                              </Text>
+                              <Text as="h1" variant="headingMd" alignment="center">
+                                ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
+                              </Text>
+                            </VerticalStack>
+                          </Box>
+                          <Box
+                            padding="4"
+                            background="bg-subdued"
+                            borderColor="border"
+                            borderWidth="1"
+                            borderRadius="2"
+                            width="25%"
+                          >
+                            <VerticalStack gap="2">
+                              <Text as="h1" variant="headingMd" alignment="center">
+                                Commissions Owed
+                              </Text>
+                              <Text as="h1" variant="headingMd" alignment="center">
+                                ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
+                              </Text>
+                            </VerticalStack>
+                          </Box>
+                        </HorizontalStack>
+                      </VerticalStack>
+                    ) : (<></>)}
+                    <VerticalStack gap="2">
+                      <Text as="h3" variant="headingMd">
+                        Terms
+                      </Text>
+                      <Text as="p" variant="bodyMd">
+                        DO NOT edit or delete any discounts or coupon codes under the title "{title}" or otherwise generated by Adelfi before the renewal date.
+                      </Text>
+                      <Text as="p" variant="bodyMd">
+                        If you wish to discontinue your partnership, contact Adelfi before your renewal date. Your service will be terminated once the current partnership period has expired.
+                      </Text>
+                    </VerticalStack>
+                  </VerticalStack>
+                </Card>
+              </VerticalStack>
+            </Layout.Section>
+            <Layout.Section>
+              <VerticalStack gap="5">
+                <Card>
+                  <VerticalStack gap="2">
+                    <HorizontalStack align="space-between">
+                      <Text as="h2" variant="headingMd">
+                        Your support team at Adelfi
+                      </Text>
+                    </HorizontalStack>
+                    <VerticalStack gap="2">
+                      <Divider />
+                      <HorizontalStack align="space-between">
+                        <Text as="span" variant="bodyMd">
+                          Katie
+                        </Text>
+                        <Badge>
+                          Marketing and Partnerships
+                        </Badge>
+                        <Link url="mailto:kellsworth@adelfi.shop" target="_blank">
+                          kellsworth@adelfi.shop
+                        </Link>
+                      </HorizontalStack>
+                      <Divider />
+                      <HorizontalStack align="space-between">
+                        <Text as="span" variant="bodyMd">
+                          Michael
+                        </Text>
+                        <Badge>
+                          Technical Support
+                        </Badge>
+                        <Link url="mailto:mglum@adelfi.shop" target="_blank">
+                          mglum@adelfi.shop
+                        </Link>
+                      </HorizontalStack>
+                      <Divider />
+                      <HorizontalStack align="space-between">
+                        <Text as="span" variant="bodyMd">
+                          Info
+                        </Text>
+                        <Badge>
+                          General Info
+                        </Badge>
+                        <Link url="mailto:info@adelfi.shop" target="_blank">
+                          info@adelfi.shop
+                        </Link>
                       </HorizontalStack>
                     </VerticalStack>
-                  ) : (<></>)}
-                  <VerticalStack gap="2">
-                    <Text as="h3" variant="headingMd">
-                      Terms
-                    </Text>
-                    <Text as="p" variant="bodyMd">
-                      DO NOT edit or delete any discounts or coupon codes under the title "{title}" or otherwise generated by Adelfi before the renewal date.
-                    </Text>
-                    <Text as="p" variant="bodyMd">
-                      If you wish to discontinue your partnership, contact Adelfi before your renewal date. Your service will be terminated once the current partnership period has expired.
-                    </Text>
                   </VerticalStack>
-                </VerticalStack>
-              </Card>
-            </VerticalStack>
-          </Layout.Section>
-          <Layout.Section>
-            <VerticalStack gap="5">
-              <Card>
-                <VerticalStack gap="2">
-                  <HorizontalStack align="space-between">
+                </Card>
+                <Card>
+                  <VerticalStack gap="2">
                     <Text as="h2" variant="headingMd">
-                      Your support team at Adelfi
+                      Next steps
                     </Text>
-                  </HorizontalStack>
-                  <VerticalStack gap="2">
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Katie
-                      </Text>
-                      <Badge>
-                        Marketing and Partnerships
-                      </Badge>
-                      <Link url="mailto:kellsworth@adelfi.shop" target="_blank">
-                        kellsworth@adelfi.shop
-                      </Link>
-                    </HorizontalStack>
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Michael
-                      </Text>
-                      <Badge>
-                        Technical Support
-                      </Badge>
-                      <Link url="mailto:mglum@adelfi.shop" target="_blank">
-                        mglum@adelfi.shop
-                      </Link>
-                    </HorizontalStack>
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Info
-                      </Text>
-                      <Badge>
-                        General Info
-                      </Badge>
-                      <Link url="mailto:info@adelfi.shop" target="_blank">
-                        info@adelfi.shop
-                      </Link>
-                    </HorizontalStack>
+                    <List spacing="extraTight">
+                      <List.Item>
+                        Ask us about our additional sorority partnership {" "}
+                        <Link
+                          url="mailto:kellsworth@adelfi.shop"
+                          target="_blank"
+                        >
+                          opportunities
+                        </Link>
+                      </List.Item>
+                      <List.Item>
+                        Explore our wesbite @ {" "}
+                        <Link
+                          url="https://www.adelfi.shop"
+                          target="_blank"
+                        >
+                          adelfi.shop
+                        </Link>
+                      </List.Item>
+                    </List>
                   </VerticalStack>
-                </VerticalStack>
-              </Card>
-              <Card>
-                <VerticalStack gap="2">
-                  <Text as="h2" variant="headingMd">
-                    Next steps
-                  </Text>
-                  <List spacing="extraTight">
-                    <List.Item>
-                      Ask us about our additional sorority partnership {" "}
-                      <Link
-                        url="mailto:kellsworth@adelfi.shop"
-                        target="_blank"
-                      >
-                        opportunities
-                      </Link>
-                    </List.Item>
-                    <List.Item>
-                      Explore our wesbite @ {" "}
-                      <Link
-                        url="https://www.adelfi.shop"
-                        target="_blank"
-                      >
-                        adelfi.shop
-                      </Link>
-                    </List.Item>
-                  </List>
-                </VerticalStack>
-              </Card>
-            </VerticalStack>
-          </Layout.Section>
-        </Layout>
-      </VerticalStack>
-    </Page>
-  );
+                </Card>
+              </VerticalStack>
+            </Layout.Section>
+          </Layout>
+        </VerticalStack>
+      </Page>
+    );
+  } else {
+    return (
+      <Page>
+        <ui-title-bar title="Adelfi">
+          <></>
+        </ui-title-bar>
+        <VerticalStack gap="5">
+          <Layout>
+            <Layout.Section>
+              <VerticalStack gap="5">
+                <Card>
+                  <VerticalStack gap="5">
+                    <VerticalStack gap="2">
+                      <Text as="h2" variant="headingMd">
+                        Consider partnering with Adelfi
+                      </Text>
+                    </VerticalStack>
+                    <VerticalStack gap="2">
+                      <Text as="h3" variant="headingMd">
+                        Partnership Details
+                      </Text>
+                      <Text as="p" variant="bodyMd">
+                        _____
+                      </Text>
+                    </VerticalStack>
+                    <VerticalStack gap="2">
+                      <Text as="h3" variant="headingMd">
+                        Terms
+                      </Text>
+                      <Text as="p" variant="bodyMd">
+                        _____
+                      </Text>
+                    </VerticalStack>
+                  </VerticalStack>
+                </Card>
+              </VerticalStack>
+            </Layout.Section>
+            <Layout.Section>
+              <VerticalStack gap="5">
+                <Card>
+                  <VerticalStack gap="2">
+                    <HorizontalStack align="space-between">
+                      <Text as="h2" variant="headingMd">
+                        Your support team at Adelfi
+                      </Text>
+                    </HorizontalStack>
+                    <VerticalStack gap="2">
+                      <Divider />
+                      <HorizontalStack align="space-between">
+                        <Text as="span" variant="bodyMd">
+                          Katie
+                        </Text>
+                        <Badge>
+                          Marketing and Partnerships
+                        </Badge>
+                        <Link url="mailto:kellsworth@adelfi.shop" target="_blank">
+                          kellsworth@adelfi.shop
+                        </Link>
+                      </HorizontalStack>
+                      <Divider />
+                      <HorizontalStack align="space-between">
+                        <Text as="span" variant="bodyMd">
+                          Michael
+                        </Text>
+                        <Badge>
+                          Technical Support
+                        </Badge>
+                        <Link url="mailto:mglum@adelfi.shop" target="_blank">
+                          mglum@adelfi.shop
+                        </Link>
+                      </HorizontalStack>
+                      <Divider />
+                      <HorizontalStack align="space-between">
+                        <Text as="span" variant="bodyMd">
+                          Info
+                        </Text>
+                        <Badge>
+                          General Info
+                        </Badge>
+                        <Link url="mailto:info@adelfi.shop" target="_blank">
+                          info@adelfi.shop
+                        </Link>
+                      </HorizontalStack>
+                    </VerticalStack>
+                  </VerticalStack>
+                </Card>
+                <Card>
+                  <VerticalStack gap="2">
+                    <Text as="h2" variant="headingMd">
+                      Next steps
+                    </Text>
+                    <List spacing="extraTight">
+                      <List.Item>
+                        Ask us about our additional sorority partnership {" "}
+                        <Link
+                          url="mailto:kellsworth@adelfi.shop"
+                          target="_blank"
+                        >
+                          opportunities
+                        </Link>
+                      </List.Item>
+                      <List.Item>
+                        Explore our wesbite @ {" "}
+                        <Link
+                          url="https://www.adelfi.shop"
+                          target="_blank"
+                        >
+                          adelfi.shop
+                        </Link>
+                      </List.Item>
+                    </List>
+                  </VerticalStack>
+                </Card>
+              </VerticalStack>
+            </Layout.Section>
+          </Layout>
+        </VerticalStack>
+      </Page>
+    );
+  }
 };
 
 async function createDiscount(admin, myCode, partnership) {

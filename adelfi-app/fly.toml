@@ -1,0 +1,43 @@
+# fly.toml app configuration file generated for adelfi on 2023-10-10T17:40:15-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "adelfi"
+primary_region = "iad"
+
+[experimental]
+  enable_consul = true
+#  cmd = ["start_with_migrations.sh"]
+#  entrypoint = ["sh"]
+
+[build]
+
+[env]
+  DATABASE_URL = "file:/litefs/sqlite.db"
+  INITIAL_DEPLOYMENT = "true"
+  PORT = "3000"
+  SCOPES = "write_discounts"
+  SHOPIFY_API_KEY = "5e08fea9e792973c455f4c456965173a"
+  SHOPIFY_APP_URL = "https://adelfi.fly.dev"
+
+[mounts]
+  source = "litefs"
+  destination = "/var/lib/litefs"
+
+[[services]]
+  internal_port = 8080
+  processess = ["app"]
+  protocol = "tcp"
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443

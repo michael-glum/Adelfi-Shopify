@@ -2,7 +2,7 @@
 
 name = "adelfi-app"
 client_id = "5e08fea9e792973c455f4c456965173a"
-application_url = "https://ul-measure-respect-running.trycloudflare.com"
+application_url = "https://adelfi.fly.dev"
 embedded = true
 
 [access_scopes]
@@ -11,9 +11,9 @@ scopes = "write_discounts"
 
 [auth]
 redirect_urls = [
-  "https://ul-measure-respect-running.trycloudflare.com/auth/callback",
-  "https://ul-measure-respect-running.trycloudflare.com/auth/shopify/callback",
-  "https://ul-measure-respect-running.trycloudflare.com/api/auth/callback"
+  "https://adelfi.fly.dev/auth/callback",
+  "https://adelfi.fly.dev/auth/shopify/callback",
+  "https://adelfi.fly.dev/api/auth/callback"
 ]
 
 [webhooks]
