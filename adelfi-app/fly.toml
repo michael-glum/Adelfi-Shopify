@@ -8,15 +8,13 @@ primary_region = "iad"
 
 [experimental]
   enable_consul = true
-  #cmd = ["start_with_migrations.sh"]
-  #entrypoint = ["sh"]
 
 [build]
 
 [env]
   DATABASE_URL = "file:/litefs/sqlite.db"
-  INITIAL_DEPLOYMENT = "true"
-  PORT = "8080"
+  INITIAL_DEPLOYMENT = "false"
+  PORT = "8081"
   SCOPES = "write_discounts"
   SHOPIFY_API_KEY = "5e08fea9e792973c455f4c456965173a"
   SHOPIFY_APP_URL = "https://adelfi.fly.dev"

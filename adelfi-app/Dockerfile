@@ -1,6 +1,6 @@
 FROM node:18-alpine
 
-EXPOSE 8080
+EXPOSE 8081
 WORKDIR /app
 COPY . .
 
@@ -14,14 +14,12 @@ RUN cp /tmp/$LITEFS_CONFIG /etc/litefs.yml
 
 RUN apk add bash fuse3 sqlite ca-certificates curl
 
-ENTRYPOINT litefs mount
-
 RUN npm install
 RUN npm run build
 
 # You'll probably want to remove this in production, it's here to make it easier to test things!
 RUN rm -f prisma/dev.sqlite
 
-ENV PORT = 8080
+ENTRYPOINT litefs mount
 
 # CMD ["npm", "run", "docker-start"]
