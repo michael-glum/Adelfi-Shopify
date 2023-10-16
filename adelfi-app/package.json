@@ -49,5 +49,8 @@
   "workspaces": [
     "extensions/*"
   ],
+  "engines": {
+    "node": "18.x"
+  },
   "author": "micha"
 }
