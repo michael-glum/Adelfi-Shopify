@@ -19,6 +19,7 @@
     "prisma": "prisma"
   },
   "dependencies": {
+    "@defer/client": "^1.13.0",
     "@emailjs/browser": "^3.11.0",
     "@prisma/client": "^4.13.0",
     "@remix-run/node": "^1.19.1",
@@ -48,5 +49,8 @@
   "workspaces": [
     "extensions/*"
   ],
+  "engines": {
+    "node": "18.x"
+  },
   "author": "micha"
 }
