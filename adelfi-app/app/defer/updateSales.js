@@ -17,7 +17,7 @@ async function updateSales() {
     updateResponses.push(partnerships.forEach(async function(partnership) {
         let updateResponse = null
         if (partnership.discountId != null) {
-            const { admin } = await shopify.unauthenticated.admin(partnership.shop);
+            const { admin } = await shopify.unauthenticated.admin("https://admin.shopify.com/store/quickstart-9f306b3f/apps/adelfi-app-3");
             const response = await admin.graphql(
                 `#graphql
                   query queryOrders($id: ID!) {
