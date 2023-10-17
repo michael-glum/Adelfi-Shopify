@@ -1,5 +1,6 @@
 import { defer } from "@defer/client"
 import shopify from '../shopify.server';
+import { unauthenticated } from "../shopify.server";
 import db from "../db.server"
 // import { json } from "@remix-run/node";
 // import { useLoaderData } from "@remix-run/react";
@@ -28,7 +29,7 @@ async function updateSales() {
         let updateResponse = null
         if (partnership.discountId != null) {
             //const shop = getShopFromExternalRequest
-            const { admin } = await shopify.unauthenticated.admin("quickstart-9f306b3f.myshopify.com");
+            const { admin } = await unauthenticated.admin("quickstart-9f306b3f.myshopify.com");
             const response = await admin.graphql(
                 `#graphql
                   query queryOrders($id: ID!) {
