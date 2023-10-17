@@ -13,6 +13,8 @@ async function seedDatabase() {
         usageLimit: 4,
         percentOff: 0.25,
         commission: 0.1,
+        totalSales: 0,
+        currSales: 0
       },
     });
 

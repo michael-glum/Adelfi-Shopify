@@ -265,7 +265,7 @@ export default function Index() {
                                 Total Sales
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
-                                ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
+                                ${partnership.totalSales} USD
                               </Text>
                             </VerticalStack>
                           </Box>
@@ -282,7 +282,7 @@ export default function Index() {
                                 Commissions Owed
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
-                                ${partnership.totalSales != null ? partnership.totalSales * partnership.commission : 0} USD
+                                ${partnership.currSales * partnership.commission} USD
                               </Text>
                             </VerticalStack>
                           </Box>

@@ -33,6 +33,6 @@ model Partnership {
   autoRenew   Boolean   @default(false)
   commission  Float
   codes       Bytes?
-  totalSales  Float?
-  currSales   Float?
+  totalSales  Float     @default(0)
+  currSales   Float     @default(0)
 }

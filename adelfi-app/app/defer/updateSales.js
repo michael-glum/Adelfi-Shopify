@@ -58,13 +58,8 @@ async function updateSales() {
                     }
                     return sales;
                 })
-                if (partnership.totalSales == null) {
-                    partnership.totalSales = newSales
-                    partnership.currSales = newSales
-                } else {
-                    partnership.totalSales += newSales;
-                    (partnership.currSales != null) ? partnership.currSales += newSales : partnership.currSales = newSales;
-                }
+                partnership.totalSales += newSales;
+                partnership.currSales += newSales;
             }
 
             const requestBody = {
