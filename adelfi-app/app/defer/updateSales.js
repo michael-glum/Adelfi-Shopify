@@ -72,9 +72,7 @@ async function updateSales() {
         return updateResponse;
     }))
 
-    return new Response(updateResponses.toString(), {
-        status: 200,
-    });
+    return updateResponses.toString()
 }
 
 export default defer(updateSales);
