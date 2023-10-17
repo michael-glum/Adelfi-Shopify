@@ -3,7 +3,7 @@
 # storage on disk. It intercepts disk writes to determine transaction boundaries
 # so that those transactions can be saved and shipped to replicas.
 fuse:
-  dir: "/litefs"
+  dir: "/app/prisma/litefs"
 
 # The data section describes settings for the internal LiteFS storage. We'll 
 # mount a volume to the data directory so it can be persisted across restarts.

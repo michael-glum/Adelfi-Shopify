@@ -12,7 +12,7 @@ primary_region = "iad"
 [build]
 
 [env]
-  DATABASE_URL = "file:/litefs/sqlite.db"
+  DATABASE_URL = "file:app/prisma/litefs/sqlite.db"
   INITIAL_DEPLOYMENT = "false"
   PORT = "8081"
   SCOPES = "write_discounts, read_orders"
