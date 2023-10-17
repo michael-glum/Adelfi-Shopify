@@ -44,11 +44,11 @@ async function supplementPartnership(partnership, graphql, shop) {
     partnership.discountId = null;
     partnership.codes = null;
   } else {
-    partnership.totalSales = codeDiscountNode?.codeDiscount?.DiscountCodeBasic?.totalSales?.amount
-    partnership.currency = codeDiscountNode?.codeDiscount?.DiscountCodeBasic?.totalSales?.currencyCode
+    //partnership.totalSales = codeDiscountNode?.codeDiscount?.DiscountCodeBasic?.totalSales?.amount
+    //partnership.currSales = codeDiscountNode?.codeDiscount?.DiscountCodeBasic?.totalSales?.currencyCode
   }
 
-  await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
+  //await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
 
   return partnership;
   

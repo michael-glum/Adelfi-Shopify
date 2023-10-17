@@ -24,12 +24,8 @@ import db from "../db.server";
 import { authenticate } from "../shopify.server";
 
 const numDiscounts = 1000;
-//const percentOff = 0.25;
-//const discountTitle = Math.round(percentOff * 100) + "% off with Adelfi"
-//const usageLimit = 3;
 const endDate = "2023-11-28T12:00:00Z";
 const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
-//const commissionRate = 0.1;
 const codePrefix = "Adelfi-"
 
 export const loader = async ({ request }) => {
