@@ -2,18 +2,8 @@ import { defer } from "@defer/client"
 import shopify from '../shopify.server';
 import { unauthenticated } from "../shopify.server";
 import db from "../db.server"
-// import { json } from "@remix-run/node";
-// import { useLoaderData } from "@remix-run/react";
-
-// export const loader = async ({ request }) => {
-//      const { admin } = await shopify.unauthenticated.admin(request);
-//      return json({admin: admin})
-// };
 
 async function updateSales() {
-    // const loaderData = useLoaderData();
-    // const shop = loaderData?.admin.graphql
-
     const partnerships = await db.partnership.findMany({
         select: {
             shop: true,
@@ -25,10 +15,11 @@ async function updateSales() {
 
     const updateResponses = []
 
+    // Shopify environmental variables need to be given to defer?
+    // Add scope for querying orders
     updateResponses.push(partnerships.forEach(async function(partnership) {
         let updateResponse = null
         if (partnership.discountId != null) {
-            //const shop = getShopFromExternalRequest
             const { admin } = await unauthenticated.admin("quickstart-9f306b3f.myshopify.com");
             const response = await admin.graphql(
                 `#graphql
