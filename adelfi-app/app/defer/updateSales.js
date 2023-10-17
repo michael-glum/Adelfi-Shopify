@@ -1,5 +1,4 @@
 import { defer } from "@defer/client"
-import shopify from '../shopify.server';
 import { unauthenticated } from "../shopify.server";
 import db from "../db.server"
 
