@@ -1,25 +1,27 @@
 import { defer } from "@defer/client"
 import { unauthenticated } from "../shopify.server";
-import db from "../db.server"
+import { json } from "@remix-run/node";
+
+const API_BASE_URL = "https://adelfi.fly.dev/api";
 
 async function updateSales() {
-    const partnerships = await db.partnership.findMany({
-        select: {
-            shop: true,
-            discountId: true,
-            totalSales: true,
-            currSales: true
-        }
-    });
+    const headers = {
+        "Authorization": `Bearer ${process.env.PRIVATE_AUTH_TOKEN}`
+    }
+
+    const response = await fetch(`${API_BASE_URL}/partnership`, { headers });
+    if (!response.ok) {
+        throw new Error("Failed to fetch partnership data");
+    }
+
+    const partnerships = await response.json();
 
     const updateResponses = []
 
-    // Shopify environmental variables need to be given to defer?
-    // Add scope for querying orders
     updateResponses.push(partnerships.forEach(async function(partnership) {
         let updateResponse = null
         if (partnership.discountId != null) {
-            const { admin } = await unauthenticated.admin("quickstart-9f306b3f.myshopify.com");
+            const { admin } = await unauthenticated.admin(partnership.shop);
             const response = await admin.graphql(
                 `#graphql
                   query queryOrders($id: ID!) {
@@ -34,10 +36,10 @@ async function updateSales() {
                     }
                   }
                 `,
-                {
-                  variables: {
-                  },
-                }
+                 {
+                   variables: {
+                   },
+                 }
             );
 
             const {
@@ -65,13 +67,24 @@ async function updateSales() {
                 }
             }
 
-            updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop }, data: { ...partnership }})
+            const requestBody = {
+                data: partnership,
+                token: `${process.env.PRIVATE_AUTH_TOKEN}`
+            }
+
+            updateResponse = await fetch(`${API_BASE_URL}/partnership`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestBody)
+            });
         }
 
         return updateResponse;
     }))
 
-    return updateResponses.toString()
+    return json(updateResponses)
 }
 
 export default defer(updateSales);

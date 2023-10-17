@@ -1,10 +1,8 @@
-import { useLoaderData } from "@remix-run/react";
 import updateSales from "~/defer/updateSales";
-import shopify from '../shopify.server';
 
-export const loader = async({request}) => {
+export const loader = async() => {
     const responseText = await updateSales();
-    return new Response(responseText.id, {
+    return new Response("" + responseText, {
         status: 200,
     });
 } 

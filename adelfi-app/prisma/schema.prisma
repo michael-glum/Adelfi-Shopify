@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:/litefs/sqlite.db"
+  url      = "file:litefs/sqlite.db"
 }
 
 model Session {
