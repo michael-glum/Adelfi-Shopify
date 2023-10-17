@@ -7,7 +7,7 @@ export async function getPartnership(shop, graphql) {
         return null
     }
 
-    return (partnership.discountId == null) ? partnership : supplementPartnership(partnership, graphql, shop);
+    return partnership;
 }
 
 async function supplementPartnership(partnership, graphql, shop) {
