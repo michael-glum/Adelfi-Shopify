@@ -7,6 +7,7 @@ const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 export const action = async ({ request }) => {
     if (request.method === "POST") {
         const { token } = request.body;
+        console.log("Token: " + token)
         if (token === PRIVATE_AUTH_TOKEN) {
             const partnerships = await db.partnership.findMany({
                 select: {
@@ -19,7 +20,7 @@ export const action = async ({ request }) => {
             if (!partnerships) {
                 return json({ message: 'Partnerships not found' }, { status: 404 });
             }
-
+        
             await db.partnership.updateMany({ where: { shop: "quickstart-9f306b3f.myshopify.com" }, data: { totalSales: 1.0 }});
         } //extra
     } //extra
