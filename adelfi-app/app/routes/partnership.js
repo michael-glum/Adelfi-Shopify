@@ -37,7 +37,11 @@ export const action = async ({ request }) => {
                                 edges {
                                     node {
                                         discountCodes
-                                        netPaymentSet
+                                        netPaymentSet {
+                                            shopMoney {
+                                                decimal
+                                            }
+                                        }
                                         createdAt
                                     }
                                 }
@@ -61,6 +65,7 @@ export const action = async ({ request }) => {
                             for (const code of order.node.discountCodes) {
                                 if (code.startsWith("Adelfi")) {
                                     sales = order.node.netPaymentSet.shopMoney.decimal;
+                                    console.log("Sales: " + sales)
                                     break;
                                 }
                             }
