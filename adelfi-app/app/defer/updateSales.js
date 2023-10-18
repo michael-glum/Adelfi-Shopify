@@ -1,5 +1,4 @@
 import { defer } from "@defer/client"
-import { unauthenticated } from "../shopify.server";
 import { json } from "@remix-run/node";
 
 const API_BASE_URL = "https://adelfi.fly.dev/api";
