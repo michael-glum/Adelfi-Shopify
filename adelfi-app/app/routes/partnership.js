@@ -4,7 +4,7 @@ import { unauthenticated } from "../shopify.server";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 
-export const loader = async ({ request }) => {
+export const action = async ({ request }) => {
     if (request.method === "POST") {
         const { token } = request.locals;
         if (token === PRIVATE_AUTH_TOKEN) {
