@@ -16,9 +16,7 @@ async function updateSales() {
             body: JSON.stringify(requestBody)
     });
 
-    const { updateResponses } = await response.json()
-
-    return json ({ updateResponses })
+    return response
 }
 
 export default defer(updateSales);
