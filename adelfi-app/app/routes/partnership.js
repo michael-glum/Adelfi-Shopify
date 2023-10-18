@@ -4,6 +4,7 @@ import { unauthenticated } from "../shopify.server";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 
+// yighay
 export const action = async ({ request }) => {
     if (request.method === "POST") {
         const { token } = await request.json();
@@ -36,7 +37,7 @@ export const action = async ({ request }) => {
                                 orders(first: 1, query: $searchQuery) {
                                     edges {
                                         node {
-                                            discountCodes #(filter: { starts_with: "Adelfi"})
+                                            discountCodes (filter: { starts_with: "Adelfi"})
                                             netPaymentSet {
                                                 shopMoney {
                                                     amount
@@ -50,7 +51,7 @@ export const action = async ({ request }) => {
                         `,
                         {
                             variables: {
-                                searchQuery: "created_at:2023-10-16",
+                                searchQuery: "created_at:2023-10-18",
                             },
                         }
                     );
@@ -64,10 +65,10 @@ export const action = async ({ request }) => {
                         orders?.edges?.forEach((order) => {
                             console.log(order.node.discountCodes)
                             for (const code of order.node.discountCodes) {
-                                if (code.startsWith("Adelfi")) {
+                                //if (code.startsWith("Adelfi")) {
                                     newSales = newSales + parseFloat(order.node.netPaymentSet.shopMoney.amount);
                                     break;
-                                }
+                                //}
                             }
                         })
                         console.log("newSales: " + newSales)

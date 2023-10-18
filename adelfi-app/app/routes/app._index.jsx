@@ -282,7 +282,7 @@ export default function Index() {
                                 Commissions Owed
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
-                                ${partnership.currSales * partnership.commission} USD
+                                ${Math.floor(partnership.currSales * partnership.commission * 100) / 100} USD
                               </Text>
                             </VerticalStack>
                           </Box>
