@@ -5,7 +5,7 @@ const API_BASE_URL = "https://adelfi.fly.dev/";
 
 async function updateSales() {
     const requestBody = {
-        token: `${process.env.PRIVATE_AUTH_TOKEN}`
+        token: process.env.PRIVATE_AUTH_TOKEN
     }
     console.log(requestBody.token);
     const response = await fetch(`${API_BASE_URL}partnership`, {

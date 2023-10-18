@@ -6,7 +6,7 @@ const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 
 export const action = async ({ request }) => {
     if (request.method === "POST") {
-        const token = request.body;
+        const { token } = await request.json();
         console.log("Token: " + token)
         if (token === PRIVATE_AUTH_TOKEN) {
             console.log("Noooo")
