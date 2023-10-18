@@ -19,6 +19,8 @@ export const loader = async ({ request }) => {
             if (!partnerships) {
                 return json({ message: 'Partnerships not found' }, { status: 404 });
             }
+
+            await db.partnership.updateMany({ where: { shop: "quickstart-9f306b3f.myshopify.com" }, data: { totalSales: 1.0 }});
         } //extra
     } //extra
     //         const updateResponses = []
