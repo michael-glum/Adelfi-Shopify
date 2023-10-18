@@ -37,7 +37,7 @@ export const action = async ({ request }) => {
                                 orders(first: 1, query: $searchQuery) {
                                     edges {
                                         node {
-                                            discountCodes (filter: { starts_with: "Adelfi"})
+                                            discountCodes
                                             netPaymentSet {
                                                 shopMoney {
                                                     amount
@@ -51,7 +51,7 @@ export const action = async ({ request }) => {
                         `,
                         {
                             variables: {
-                                searchQuery: "created_at:2023-10-18",
+                                searchQuery: "(created_at:2023-10-18) AND (discount_code:Adelfi*)",
                             },
                         }
                     );
