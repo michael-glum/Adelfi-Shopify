@@ -8,7 +8,7 @@ async function updateSales() {
         token: `${process.env.PRIVATE_AUTH_TOKEN}`
     }
 
-    const response = await fetch(`${API_BASE_URL}/partnership`, {
+    const response = await fetch(`${API_BASE_URL}partnership`, {
         method: "POST",
             headers: {
                 "Content-Type": "application/json",
