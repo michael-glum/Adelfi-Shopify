@@ -7,7 +7,7 @@ async function updateSales() {
     const requestBody = {
         token: `${process.env.PRIVATE_AUTH_TOKEN}`
     }
-
+    console.log(requestBody.token);
     const response = await fetch(`${API_BASE_URL}partnership`, {
         method: "POST",
         headers: {
