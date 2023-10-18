@@ -5,22 +5,22 @@ import { unauthenticated } from "../../shopify.server";
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 
 export const loader = async ({ request }) => {
-    // if (request.method === "POST") {
-    //     const { token } = request.locals;
-    //     if (token === PRIVATE_AUTH_TOKEN) {
-    //         const partnerships = await db.partnership.findMany({
-    //             select: {
-    //                 shop: true,
-    //                 discountId: true,
-    //                 totalSales: true,
-    //                 currSales: true
-    //             }
-    //         });
-
-    //         if (!partnerships) {
-    //             return json({ message: 'Partnerships not found' }, { status: 404 });
-    //         }
-
+    if (request.method === "POST") {
+        const { token } = request.locals;
+        if (token === PRIVATE_AUTH_TOKEN) {
+            const partnerships = await db.partnership.findMany({
+                select: {
+                    shop: true,
+                    discountId: true,
+                    totalSales: true,
+                    currSales: true
+                }
+            });
+            if (!partnerships) {
+                return json({ message: 'Partnerships not found' }, { status: 404 });
+            }
+        } //extra
+    } //extra
     //         const updateResponses = []
 
     //         updateResponses.push(partnerships.forEach(async function(partnership) {
