@@ -65,14 +65,14 @@ export const action = async ({ request }) => {
                             console.log(order.node.discountCodes)
                             for (const code of order.node.discountCodes) {
                                 if (code.startsWith("Adelfi")) {
-                                    newSales += order.node.netPaymentSet.shopMoney.amount;
+                                    newSales = newSales + parseFloat(order.node.netPaymentSet.shopMoney.amount);
                                     break;
                                 }
                             }
                         })
                         console.log("newSales: " + newSales)
-                        partnership.totalSales += newSales;
-                        partnership.currSales += newSales;
+                        partnership.totalSales = partnership.totalSales + newSales;
+                        partnership.currSales = partnership.currSales + newSales;
                     }
                     try {
                         const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop }, data: { ...partnership }})
