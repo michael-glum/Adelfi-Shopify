@@ -43,7 +43,7 @@ export const action = async ({ request }) => {
                                                     amount
                                                 }
                                             }
-                                            createdAt
+                                            #createdAt
                                         }
                                     }
                                 }
@@ -64,12 +64,12 @@ export const action = async ({ request }) => {
                         let newSales = 0.0;
                         orders?.edges?.forEach((order) => {
                             console.log(order.node.discountCodes)
-                            for (const code of order.node.discountCodes) {
+                            //for (const code of order.node.discountCodes) {
                                 //if (code.startsWith("Adelfi")) {
                                     newSales = newSales + parseFloat(order.node.netPaymentSet.shopMoney.amount);
-                                    break;
+                                    //break;
                                 //}
-                            }
+                            //}
                         })
                         console.log("newSales: " + newSales)
                         partnership.totalSales = partnership.totalSales + newSales;
