@@ -32,25 +32,25 @@ export const action = async ({ request }) => {
                     const { admin } = await unauthenticated.admin(partnership.shop);
                     const response = await admin.graphql(
                         `#graphql
-                        query queryOrders($date: String!) {
-                            orders(query: "created_at:" $date) {
-                                edges {
-                                    node {
-                                        discountCodes
-                                        netPaymentSet {
-                                            shopMoney {
-                                                amount
+                            query queryOrders($date: String!) {
+                                orders(query: "created_at:" $date) {
+                                    edges {
+                                        node {
+                                            discountCodes
+                                            netPaymentSet {
+                                                shopMoney {
+                                                    amount
+                                                }
                                             }
+                                            createdAt
                                         }
-                                        createdAt
                                     }
                                 }
                             }
-                        }
                         `,
                         {
                             variables: {
-                                date: "2023-10-16"
+                                date: "2023-10-16",
                             },
                         }
                     );
@@ -61,11 +61,11 @@ export const action = async ({ request }) => {
 
                     if (orders != null) {
                         let newSales = 0;
-                        newSales += orders?.edges?.forEach(function(order) {
+                        newSales += orders?.edges?.forEach(function(node) {
                             let sales = 0;
-                            for (const code of order.node.discountCodes) {
+                            for (const code of node.discountCodes) {
                                 if (code.startsWith("Adelfi")) {
-                                    sales = order.node.netPaymentSet.shopMoney.amount;
+                                    sales = node.netPaymentSet.shopMoney.amount;
                                     console.log("Sales: " + sales)
                                     break;
                                 }
