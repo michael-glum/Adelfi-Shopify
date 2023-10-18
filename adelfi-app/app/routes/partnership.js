@@ -32,8 +32,8 @@ export const action = async ({ request }) => {
                     const { admin } = await unauthenticated.admin(partnership.shop);
                     const response = await admin.graphql(
                         `#graphql
-                        query queryOrders($id: ID!) {
-                            orders(query: "created_at:2023-10-16") {
+                        query queryOrders($date: String!) {
+                            orders(query: "created_at:" $date) {
                                 edges {
                                     node {
                                         discountCodes
@@ -50,6 +50,7 @@ export const action = async ({ request }) => {
                         `,
                         {
                             variables: {
+                                date: "2023-10-16"
                             },
                         }
                     );
