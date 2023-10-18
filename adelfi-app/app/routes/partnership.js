@@ -33,7 +33,7 @@ export const action = async ({ request }) => {
                     const response = await admin.graphql(
                         `#graphql
                             query queryOrders($date: String!) {
-                                orders(query: "created_at:" $date) {
+                                orders(query: "created_at:$date") {
                                     edges {
                                         node {
                                             discountCodes
