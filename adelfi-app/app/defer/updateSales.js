@@ -79,7 +79,7 @@ async function updateSales() {
         return updateResponse;
     }))
 
-    return json(updateResponses)
+    return JSON.stringify(updateResponses)
 }
 
 export default defer(updateSales);
