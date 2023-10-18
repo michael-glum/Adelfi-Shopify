@@ -5,10 +5,12 @@ import { unauthenticated } from "../shopify.server";
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 
 export const action = async ({ request }) => {
+    console.log("" + process.env.PRIVATE_AUTH_TOKEN);
     if (request.method === "POST") {
         const token = request.body.token;
         console.log("Token: " + token)
         if (token === PRIVATE_AUTH_TOKEN) {
+            console.log("Noooo")
             const partnerships = await db.partnership.findMany({
                 select: {
                     shop: true,
