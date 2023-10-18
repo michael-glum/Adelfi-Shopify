@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
-import db from "../../db.server"
-import { unauthenticated } from "../../shopify.server";
+import db from "../db.server"
+import { unauthenticated } from "../shopify.server";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 

@@ -1,7 +1,7 @@
 import { defer } from "@defer/client"
 import { json } from "@remix-run/node";
 
-const API_BASE_URL = "https://adelfi.fly.dev/api";
+const API_BASE_URL = "https://adelfi.fly.dev/";
 
 async function updateSales() {
     const requestBody = {
