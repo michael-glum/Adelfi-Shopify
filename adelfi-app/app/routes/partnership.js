@@ -36,13 +36,7 @@ export const action = async ({ request }) => {
                                 orders(first: 1, query: $searchQuery) {
                                     edges {
                                         node {
-                                            discountCodes {
-                                                edges {
-                                                    node {
-                                                        code
-                                                    }
-                                                }
-                                            }#(filter: { starts_with: "Adelfi"})
+                                            discountCodes #(filter: { starts_with: "Adelfi"})
                                             netPaymentSet {
                                                 shopMoney {
                                                     amount
@@ -67,12 +61,12 @@ export const action = async ({ request }) => {
 
                     if (orders != null) {
                         let newSales = 0;
-                        newSales += orders?.edges?.forEach(function(node) {
+                        newSales += orders?.edges?.forEach(function(order) {
                             let sales = 0;
-                            console.log(node.discountCodes)
-                            for (const code of node.discountCodes.edges) {
-                                if (code.node.code.startsWith("Adelfi")) {
-                                    sales = node.netPaymentSet.shopMoney.amount;
+                            console.log(order.node.discountCodes)
+                            for (const code of order.node.discountCodes) {
+                                if (code.startsWith("Adelfi")) {
+                                    sales = order.node.netPaymentSet.shopMoney.amount;
                                     console.log("Sales: " + sales)
                                     break;
                                 }
