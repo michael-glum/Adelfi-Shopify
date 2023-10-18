@@ -73,6 +73,7 @@ export const action = async ({ request }) => {
                             }
                             return sales;
                         })
+                        console.log("newSales: " + newSales)
                         partnership.totalSales += newSales;
                         partnership.currSales += newSales;
                     }
