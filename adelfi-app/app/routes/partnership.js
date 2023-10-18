@@ -39,7 +39,7 @@ export const action = async ({ request }) => {
                                         discountCodes
                                         netPaymentSet {
                                             shopMoney {
-                                                decimal
+                                                amount
                                             }
                                         }
                                         createdAt
@@ -64,7 +64,7 @@ export const action = async ({ request }) => {
                             let sales = 0;
                             for (const code of order.node.discountCodes) {
                                 if (code.startsWith("Adelfi")) {
-                                    sales = order.node.netPaymentSet.shopMoney.decimal;
+                                    sales = order.node.netPaymentSet.shopMoney.amount;
                                     console.log("Sales: " + sales)
                                     break;
                                 }
