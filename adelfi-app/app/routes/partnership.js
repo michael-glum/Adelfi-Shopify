@@ -6,7 +6,7 @@ const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 
 export const action = async ({ request }) => {
     if (request.method === "POST") {
-        const token = JSON.parse(request.body).token;
+        const token = request.body.token;
         console.log("Token: " + token)
         if (token === PRIVATE_AUTH_TOKEN) {
             const partnerships = await db.partnership.findMany({
