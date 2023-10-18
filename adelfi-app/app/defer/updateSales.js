@@ -10,10 +10,10 @@ async function updateSales() {
 
     const response = await fetch(`${API_BASE_URL}partnership`, {
         method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestBody)
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody)
     });
 
     return response
