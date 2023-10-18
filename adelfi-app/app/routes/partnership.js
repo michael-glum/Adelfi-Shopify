@@ -60,7 +60,7 @@ export const action = async ({ request }) => {
                     } = await response.json();
 
                     if (orders != null) {
-                        let newSales = 0;
+                        let newSales = 0.0;
                         orders?.edges?.forEach((order) => {
                             console.log(order.node.discountCodes)
                             for (const code of order.node.discountCodes) {
