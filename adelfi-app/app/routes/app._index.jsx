@@ -47,6 +47,16 @@ export async function action({ request }) {
     return null
   }
 
+  // Set up bulk operations webhook subscription if it doesn't already exist
+  if (partnership.webhookId == null) {
+    const webhookId = await subscribeToBulkOperationsWebhook(admin);
+    if (webhookId == null) {
+      return null;
+    } else {
+      partnership.webhookId = webhookId;
+    }
+  }
+
   const codeLength = 9
 
   const codesArray = generateCodesArray(numDiscounts, codeLength)
@@ -65,19 +75,11 @@ export async function action({ request }) {
 
   const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
-  // Set up bulk operations webhook subscription if it doesn't already exist
-  if (partnership.webhookId == null) {
-      partnership.webhookId = await subscribeToBulkOperationsWebhook(admin);
-  }
-
   partnership.isActive = true
   partnership.expires = new Date(endDate)
   partnership.autoRenew = true
 
-  let updatePartnership
-  if (partnership.webhookId != null) {
-    updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
-  }
+  const updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
 
   return json({
     discount: discountJson.data.discountCodeBasicCreate.codeDiscountNode,
