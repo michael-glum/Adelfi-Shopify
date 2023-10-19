@@ -661,7 +661,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
         "topic": "BULK_OPERATIONS_FINISH",
         "webhookSubscription": {
           "callbackUrl": `${BASE_URL}processOrders`,
-          "format": JSON
+          "format": "JSON"
         }
       },
     }
