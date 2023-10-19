@@ -27,6 +27,7 @@ const numDiscounts = 1000;
 const endDate = "2023-11-28T12:00:00Z";
 const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
 const codePrefix = "Adelfi-"
+const BASE_URL = "https://adelfi.fly.dev/";
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
@@ -64,11 +65,19 @@ export async function action({ request }) {
 
   const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
+  // Set up bulk operations webhook subscription if it doesn't already exist
+  if (partnership.webhookId == null) {
+      partnership.webhookId = await subscribeToBulkOperationsWebhook(admin);
+  }
+
   partnership.isActive = true
   partnership.expires = new Date(endDate)
   partnership.autoRenew = true
 
-  const updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
+  let updatePartnership
+  if (partnership.webhookId != null) {
+    updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
+  }
 
   return json({
     discount: discountJson.data.discountCodeBasicCreate.codeDiscountNode,
@@ -625,4 +634,38 @@ function arrayToTextFile(data) {
   const blob = new Blob([textContent], { type: 'text/plain'});
 
   return blob;
+}
+
+async function subscribeToBulkOperationsWebhook(admin) {
+  const response = await admin.graphql(
+    `#graphql
+      mutation webhookSubscriptionCreate($topic: WebhookSubscriptionTopic!, $webhookSubscription: WebhookSubscriptionInput!) {
+        webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {
+          webhookSubscription {
+            id
+            topic
+            format
+            endpoint {
+              __typename
+              ... on WebhookHttpEndpoint {
+                callbackUrl
+              }
+            }
+          }
+        }
+      }`,
+    {
+      variables: {
+        "topic": "BULK_OPERATIONS_COMPLETE",
+        "webhookSubscription": {
+          "callbackUrl": `${BASE_URL}processOrders`,
+          "format": JSON
+        }
+      },
+    }
+  ); 
+  const { webhookSubscriptionCreate } = await response.json()
+  const webhookId = await webhookSubscriptionCreate.webhookSubscription.id;
+  console.log("Webhook Created: " + webhookId)
+  return webhookId
 }

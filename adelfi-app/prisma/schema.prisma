@@ -35,4 +35,5 @@ model Partnership {
   codes       Bytes?
   totalSales  Float     @default(0)
   currSales   Float     @default(0)
+  webhookId   String?
 }

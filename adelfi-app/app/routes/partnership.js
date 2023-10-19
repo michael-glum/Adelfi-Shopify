@@ -31,61 +31,63 @@ export const action = async ({ request }) => {
             updateResponses.push(partnerships.forEach(async function(partnership) {
                 if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
                     const { admin } = await unauthenticated.admin(partnership.shop);
-                    const response = await admin.graphql(
-                        `#graphql
-                            query queryOrders($searchQuery: String!) {
-                                orders(first: 10, query: $searchQuery) {
-                                    edges {
-                                        node {
-                                            discountCodes
-                                            netPaymentSet {
-                                                shopMoney {
-                                                    amount
-                                                }
-                                            }
-                                            #createdAt
-                                        }
-                                    }
-                                }
-                            }
-                        `,
-                        {
-                            variables: {
-                                searchQuery: "(created_at:2023-10-18) AND (discount_code:Adelfi*)",
-                            },
-                        }
-                    );
+                    const bulkOpResponse = await queryOrdersBulkOperation(admin);
+                    console.log("Bulk Operation Response Status: " + bulkOpResponse)
+                    // const response = await admin.graphql(
+                    //     `#graphql
+                    //         query queryOrders($searchQuery: String!) {
+                    //             orders(first: 10, query: $searchQuery) {
+                    //                 edges {
+                    //                     node {
+                    //                         discountCodes
+                    //                         netPaymentSet {
+                    //                             shopMoney {
+                    //                                 amount
+                    //                             }
+                    //                         }
+                    //                         #createdAt
+                    //                     }
+                    //                 }
+                    //             }
+                    //         }
+                    //     `,
+                    //     {
+                    //         variables: {
+                    //             searchQuery: "(created_at:2023-10-18) AND (discount_code:Adelfi*)",
+                    //         },
+                    //     }
+                    // );
 
-                    const {
-                        data: { orders },
-                    } = await response.json();
+                    // const {
+                    //     data: { orders },
+                    // } = await response.json();
 
-                    if (orders != null) {
-                        let newSales = 0.0;
-                        orders?.edges?.forEach((order) => {
-                            console.log(order.node.discountCodes)
-                            //for (const code of order.node.discountCodes) {
-                                //if (code.startsWith("Adelfi")) {
-                                    newSales = newSales + parseFloat(order.node.netPaymentSet.shopMoney.amount);
-                                    //break;
-                                //}
-                            //}
-                        })
-                        console.log("newSales: " + newSales)
-                        partnership.totalSales = partnership.totalSales + newSales;
-                        partnership.currSales = partnership.currSales + newSales;
-                    }
-                    try {
-                        const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop }, data: { ...partnership }})
-                        if (updateResponse.count === 0) {
-                            return json({ error: "Partnership not updated" }, { status: 400 });
-                        } else {
-                            return json({ success: "Partnership updated" });
-                        }
-                    } catch (error) {
-                        console.error("Error updating partnerships", error);
-                        return json({ error: "Internal server error" }, { status: 500 });
-                    }
+                    // if (orders != null) {
+                    //     let newSales = 0.0;
+                    //     orders?.edges?.forEach((order) => {
+                    //         console.log(order.node.discountCodes)
+                    //         //for (const code of order.node.discountCodes) {
+                    //             //if (code.startsWith("Adelfi")) {
+                    //                 newSales = newSales + parseFloat(order.node.netPaymentSet.shopMoney.amount);
+                    //                 //break;
+                    //             //}
+                    //         //}
+                    //     })
+                    //     console.log("newSales: " + newSales)
+                    //     partnership.totalSales = partnership.totalSales + newSales;
+                    //     partnership.currSales = partnership.currSales + newSales;
+                    // }
+                    // try {
+                    //     const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop }, data: { ...partnership }})
+                    //     if (updateResponse.count === 0) {
+                    //         return json({ error: "Partnership not updated" }, { status: 400 });
+                    //     } else {
+                    //         return json({ success: "Partnership updated" });
+                    //     }
+                    // } catch (error) {
+                    //     console.error("Error updating partnerships", error);
+                    //     return json({ error: "Internal server error" }, { status: 500 });
+                    // }
                 } else {
                     return json({ error: "No discountId attached to this shop" })
                 }
@@ -97,4 +99,46 @@ export const action = async ({ request }) => {
     }
     return json({ message: "API endpoint reached"});
 };
-  
+
+
+async function queryOrdersBulkOperation(admin) {
+    const response = await admin.graphql(
+      `#graphql
+        mutation bulkOperationRunQuery($searchQuery: String!) {
+          bulkOperationRunQuery(
+            query: """
+            {
+              orders(query: $searchQuery) {
+                edges {
+                  node {
+                    discountCodes
+                    netPaymentSet {
+                      shopMoney {
+                        amount
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """
+          ) {
+            bulkOperation {
+              id
+              status
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+      {
+        variables: {
+            searchQuery: "(created_at:2023-10-18) AND (discount_code:Adelfi*)"
+        }
+      }
+    ); 
+    const { data } = await response.json()
+    return await data.bulkOperationRunQuery.bulkOperation.status;
+}
