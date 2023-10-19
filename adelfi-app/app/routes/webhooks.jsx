@@ -14,6 +14,7 @@ export const action = async ({ request }) => {
     case "CUSTOMERS_REDACT":
     case "SHOP_REDACT":
     default:
+      console.log("Unhandled webhook topic")
       throw new Response("Unhandled webhook topic", { status: 404 });
   }
 

@@ -25,6 +25,10 @@ const shopify = shopifyApp({
       deliveryMethod: DeliveryMethod.Http,
       callbackUrl: "/webhooks",
     },
+    BULK_OPERATIONS_FINISHED: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/processOrders"
+    }
   },
   hooks: {
     afterAuth: async ({ session }) => {
