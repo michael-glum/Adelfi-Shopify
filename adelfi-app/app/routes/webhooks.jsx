@@ -2,6 +2,7 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 
 export const action = async ({ request }) => {
+  console.log("Webhook endpoint reached")
   const { topic, shop, session } = await authenticate.webhook(request);
 
   switch (topic) {

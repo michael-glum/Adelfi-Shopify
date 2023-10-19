@@ -653,7 +653,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
       variables: {
         "topic": "BULK_OPERATIONS_FINISH",
         "webhookSubscription": {
-          "callbackUrl": BASE_URL + "webhooks",
+          "callbackUrl": "https://adelfi.fly.dev/webhooks",
           "format": "JSON"
         }
       },
@@ -661,7 +661,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
   ); 
   const responseJson = await response.json()
   console.log(responseJson.data.webhookSubscriptionCreate)
-  const webhookId = responseJson.data.webhookSubscriptionCreate.webhookSubscription.id;
+  const webhookId = await responseJson.data.webhookSubscriptionCreate.webhookSubscription.id;
   console.log("Webhook Created: " + webhookId)
   return webhookId
 }
