@@ -660,8 +660,8 @@ async function subscribeToBulkOperationsWebhook(admin) {
     }
   ); 
   const responseJson = await response.json()
-  console.log(responseJson)
-  const webhookId = responseJson.webhookSubscriptionCreate.webhookSubscription.id;
+  console.log(responseJson.data.webhookSubscriptionCreate)
+  const webhookId = responseJson.data.webhookSubscriptionCreate.webhookSubscription.id;
   console.log("Webhook Created: " + webhookId)
   return webhookId
 }

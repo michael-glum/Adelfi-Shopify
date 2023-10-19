@@ -13,7 +13,7 @@ export const action = async ({ request }) => {
     case "CUSTOMERS_DATA_REQUEST":
     case "CUSTOMERS_REDACT":
     case "SHOP_REDACT":
-    case "BULK_OPERATIONS_FINISHED":
+    case "BULK_OPERATIONS_FINISH":
       console.log("Bulk Operations Finished")
     default:
       console.log("Unhandled webhook topic")
