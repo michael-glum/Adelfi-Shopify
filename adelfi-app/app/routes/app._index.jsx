@@ -255,7 +255,7 @@ export default function Index() {
                         </pre>
                       </Box>
                     )}
-                    {partnership.discountId != null ? (
+                    {partnership.totalSales > 0 ? (
                       <VerticalStack gap="2">
                         <Text as="h3" variant="headingMd">
                           Usage
@@ -656,7 +656,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
       }`,
     {
       variables: {
-        "topic": "BULK_OPERATIONS_COMPLETE",
+        "topic": "BULK_OPERATIONS_FINISH",
         "webhookSubscription": {
           "callbackUrl": `${BASE_URL}processOrders`,
           "format": JSON
