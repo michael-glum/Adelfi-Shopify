@@ -27,7 +27,7 @@ const shopify = shopifyApp({
     },
     BULK_OPERATIONS_FINISHED: {
       deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/processOrders"
+      callbackUrl: "/webhooks"
     }
   },
   hooks: {

@@ -645,6 +645,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
         webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {
           webhookSubscription {
             id
+            topic
           }
         }
       }`,
@@ -652,7 +653,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
       variables: {
         "topic": "BULK_OPERATIONS_FINISH",
         "webhookSubscription": {
-          "callbackUrl": `${BASE_URL}processOrders`,
+          "callbackUrl": BASE_URL + "webhooks",
           "format": "JSON"
         }
       },

@@ -13,6 +13,8 @@ export const action = async ({ request }) => {
     case "CUSTOMERS_DATA_REQUEST":
     case "CUSTOMERS_REDACT":
     case "SHOP_REDACT":
+    case "BULK_OPERATIONS_FINISHED":
+      console.log("Bulk Operations Finished")
     default:
       console.log("Unhandled webhook topic")
       throw new Response("Unhandled webhook topic", { status: 404 });
