@@ -645,14 +645,6 @@ async function subscribeToBulkOperationsWebhook(admin) {
         webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {
           webhookSubscription {
             id
-            topic
-            format
-            endpoint {
-              __typename
-              ... on WebhookHttpEndpoint {
-                callbackUrl
-              }
-            }
           }
         }
       }`,
@@ -666,8 +658,9 @@ async function subscribeToBulkOperationsWebhook(admin) {
       },
     }
   ); 
-  const { webhookSubscriptionCreate } = await response.json()
-  const webhookId = await webhookSubscriptionCreate.webhookSubscription.id;
+  const responseJson = await response.json()
+  console.log(responseJson)
+  const webhookId = responseJson.webhookSubscriptionCreate.webhookSubscription.id;
   console.log("Webhook Created: " + webhookId)
   return webhookId
 }
