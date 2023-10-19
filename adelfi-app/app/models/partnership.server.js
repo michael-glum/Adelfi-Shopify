@@ -7,7 +7,7 @@ export async function getPartnership(shop, graphql) {
         return null
     }
 
-    return partnership;
+    return (partnership.discountId == null) ? partnership : await supplementPartnership(partnership, graphql, shop);
 }
 
 async function supplementPartnership(partnership, graphql, shop) {
@@ -17,14 +17,6 @@ async function supplementPartnership(partnership, graphql, shop) {
       query supplementPartnership($id: ID!) {
         codeDiscountNode(id: $id) {
           id
-          codeDiscount {
-            ... on DiscountCodeBasic {
-              totalSales {
-                amount
-                currencyCode
-              }
-            }
-          }
         }
       }
     `,
@@ -43,12 +35,8 @@ async function supplementPartnership(partnership, graphql, shop) {
   if (codeDiscountNode == null) {
     partnership.discountId = null;
     partnership.codes = null;
-  } else {
-    //partnership.totalSales = codeDiscountNode?.codeDiscount?.DiscountCodeBasic?.totalSales?.amount
-    //partnership.currSales = codeDiscountNode?.codeDiscount?.DiscountCodeBasic?.totalSales?.currencyCode
+    await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
   }
-
-  //await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
 
   return partnership;
   
