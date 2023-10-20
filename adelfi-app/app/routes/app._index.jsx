@@ -661,7 +661,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
       variables: {
         "topic": "BULK_OPERATIONS_FINISH",
         "webhookSubscription": {
-          "callbackUrl": BASE_URL + "processOrders",
+          "callbackUrl": BASE_URL + "processBulkOrders",
           "format": "JSON"
         }
       },
@@ -679,7 +679,7 @@ async function isExistingWebhook(admin) {
   const response = await admin.graphql(
     `#graphql
       query {
-        webhookSubscriptions(first: 10, topics: ["BULK_OPERATIONS_FINISH"]) {
+        webhookSubscriptions(first: 10) {#, topics: BULK_OPERATIONS_FINISH#) {
           edges {
             node {
               id
@@ -698,6 +698,8 @@ async function isExistingWebhook(admin) {
   );
 
   const { webhookSubscriptions } = await response.json();
+  console.log("webhookSubscriptions: " + webhookSubscriptions)
+  if (webhookSubscriptions.edges == null) { return false }
   if (webhookSubscriptions.edges.length > 0) {
     webhookSubscriptions.edges.forEach((node) => {
       console.log("callbackUrl: " + node.endpoint.callbackUrl);
