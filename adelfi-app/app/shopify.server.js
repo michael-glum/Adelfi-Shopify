@@ -27,7 +27,7 @@ const shopify = shopifyApp({
     },
     BULK_OPERATIONS_FINISH: {
       deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "http://adelfi.fly.dev/processOrders"
+      callbackUrl: "https://adelfi.fly.dev/processOrders"
     }
   },
   hooks: {
