@@ -643,6 +643,10 @@ async function subscribeToBulkOperationsWebhook(admin) {
     `#graphql
       mutation webhookSubscriptionCreate($topic: WebhookSubscriptionTopic!, $webhookSubscription: WebhookSubscriptionInput!) {
         webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {
+          userErrors {
+            field
+            message
+          }
           webhookSubscription {
             id
             topic
@@ -661,6 +665,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
   ); 
   const responseJson = await response.json()
   console.log(responseJson.data.webhookSubscriptionCreate)
+  console.log(responseJson.data.webhookSubscriptionCreate.userErrors.message)
   const webhookSubscription = await responseJson.data.webhookSubscriptionCreate.webhookSubscription;
   const webhookId = await webhookSubscription.id;
   console.log("Webhook Created: " + webhookId)
