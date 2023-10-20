@@ -639,9 +639,10 @@ function arrayToTextFile(data) {
 }
 
 async function subscribeToBulkOperationsWebhook(admin) {
-  if (await isExistingWebhook(admin)) {
+  const existingWebhook = await isExistingWebhook(admin);
+  if (existingWebhook != null) {
       console.log("Bulk Operations Webhook is already subscribed")
-      return null
+      return existingWebhook;
   }
   const response = await admin.graphql(
     `#graphql
@@ -697,15 +698,21 @@ async function isExistingWebhook(admin) {
     {}
   );
 
-  const { webhookSubscriptions } = await response.json();
-  console.log("webhookSubscriptions: " + webhookSubscriptions)
-  if (webhookSubscriptions.edges == null) { return false }
-  if (webhookSubscriptions.edges.length > 0) {
-    webhookSubscriptions.edges.forEach((node) => {
-      console.log("callbackUrl: " + node.endpoint.callbackUrl);
-    })
-    return true;
-  } else {
-    return false;
+  const responseJson = await response.json();
+  console.log("responseJson.webhookSubscriptions.edges[0].node.id: " + responseJson.data.webhookSubscriptions.edges[0].node.id)
+  if (responseJson.data.webhookSubscriptions.edges == null) {
+    return null
   }
+  for (let i = 0; i < responseJson.data.webhookSubscriptions.edges.length; i++) {
+    const id = responseJson.data.webhookSubscriptions.edges[i].node.id
+    console.log("id: " + id);
+    const topic = responseJson.data.webhookSubscriptions.edges[i].node.topic
+    console.log("topic: " + topic);
+    const callbackUrl = responseJson.data.webhookSubscriptions.edges[i].node.endpoint.callbackUrl
+    console.log("callbackUrl: " + callbackUrl);
+    if (callbackUrl.substring(callbackUrl.lastIndexOf("/")) == "/processBulkOrders") {
+      return id
+    }
+  }
+  return null;
 }
