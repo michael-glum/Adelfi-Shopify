@@ -27,12 +27,13 @@ const shopify = shopifyApp({
     },
     BULK_OPERATIONS_FINISH: {
       deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/webhooks"
+      callbackUrl: "http://adelfi.fly.dev/processOrders"
     }
   },
   hooks: {
     afterAuth: async ({ session }) => {
       shopify.registerWebhooks({ session });
+      console.log("Auth happened -shopify.server.js")
     },
   },
   ...(process.env.SHOP_CUSTOM_DOMAIN

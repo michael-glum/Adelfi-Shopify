@@ -653,7 +653,7 @@ async function subscribeToBulkOperationsWebhook(admin) {
       variables: {
         "topic": "BULK_OPERATIONS_FINISH",
         "webhookSubscription": {
-          "callbackUrl": "https://adelfi.fly.dev/webhooks",
+          "callbackUrl": BASE_URL + "processOrders",
           "format": "JSON"
         }
       },

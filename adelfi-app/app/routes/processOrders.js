@@ -5,7 +5,7 @@ export const action = async ({ request }) => {
     try {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
-        console.log("We're here!")
+        console.log("Webhook processing...")
         const { topic, shop, session } = await authenticate.webhook(request);
         console.log("Webhook from shop: " + shop)
         console.log("Topic: " + topic)
