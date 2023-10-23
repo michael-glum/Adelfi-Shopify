@@ -5,16 +5,16 @@ import { createInterface } from 'readline'
 import db from '../db.server'
 
 export const action = async ({ request }) => {
-    try {
+    //try {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
         console.log("Webhook processing...")
         const req = request
-        const { topic, shop, session, } = await authenticate.webhook(req);
+        const { topic, shop, session, } = await authenticate.webhook(request);
         const { admin } = await unauthenticated.admin(shop);
         console.log("Webhook from shop: " + shop)
         console.log("Topic: " + topic)
-        console.log("Session: " + session)
+        console.log("Session: " + JSON.stringify(session))
 
         const { admin_graphql_api_id, status, error_code } = await req.json()
         
@@ -95,11 +95,11 @@ export const action = async ({ request }) => {
         // Respond with a success status.
         console.log("Successfully processed bulk orders webhook")
         return json({ success: true });
-    } catch (error) {
+    /*} catch (error) {
         console.error('Error processing the webhook:', error);
         // Handle the error and respond accordingly.
         return json({ error: 'Webhook processing failed' }, { status: 400 });
-    }
+    }*/
 };
 
 async function downloadJsonData(url) {
