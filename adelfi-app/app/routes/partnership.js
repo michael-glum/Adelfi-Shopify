@@ -44,7 +44,7 @@ export const action = async ({ request }) => {
 
 
 async function queryOrdersBulkOperation(admin) {
-    const searchQuery = "(created_at:2023-10-18) AND (discount_code:Adelfi*)"
+    const searchQuery = "created_at:2023-10-18 AND discount_code:Adelfi*"
     const graphqlQuery =
     `{
       orders(query: ${searchQuery}) {
@@ -81,6 +81,7 @@ async function queryOrdersBulkOperation(admin) {
       }
     ); 
     const responseJson = await response.json()
+    console.log("Response: " + response)
     console.log("userErrors message: " + responseJson.userErrors?.message)
     console.log("Data: " + responseJson.data)
     console.log("BulkOperationRunQuery: " + responseJson.data.bulkOperationRunQuery)
