@@ -9,8 +9,8 @@ export const action = async ({ request }) => {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
         console.log("Webhook processing...")
-        const requestJson = await request.body.json()
-        console.log("Request Json: " + JSON.stringify(requestJson))
+        const requestJson = await request.body
+        console.log("Request Json: " + requestJson)
         const { topic, shop, session } = await authenticate.webhook(request);
         const { admin } = await unauthenticated.admin(shop);
         console.log("Webhook from shop: " + shop)
