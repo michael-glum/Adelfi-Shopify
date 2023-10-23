@@ -28,7 +28,7 @@ export const action = async ({ request }) => {
                 if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
                     const { admin } = await unauthenticated.admin(partnership.shop);
                     const bulkOpResponse = await queryOrdersBulkOperation(admin);
-                    console.log("Bulk Operation Response Status: " + bulkOpResponse)
+                    console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
                 } else {
                     return json({ error: "No discountId attached to this shop" })
                 }
