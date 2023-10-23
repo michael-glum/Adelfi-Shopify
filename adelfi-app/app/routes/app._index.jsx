@@ -705,6 +705,7 @@ async function isExistingWebhook(admin) {
   if (responseJson.data.webhookSubscriptions.edges == null) {
     return null
   }
+  let existingWebhookId = null;
   for (let i = 0; i < responseJson.data.webhookSubscriptions.edges.length; i++) {
     const topic = responseJson.data.webhookSubscriptions.edges[i].node.topic
     console.log("topic: " + topic);
@@ -714,9 +715,36 @@ async function isExistingWebhook(admin) {
       const callbackUrl = responseJson.data.webhookSubscriptions.edges[i].node.endpoint.callbackUrl
       console.log("callbackUrl: " + callbackUrl);
       if (callbackUrl.substring(callbackUrl.lastIndexOf("/")) == "/processBulkOrders") {
-        return id
+        existingWebhookId = id
+      } else {
+        deleteExistingWebhook(admin, id)
       }
     }
   }
-  return null;
+  return existingWebhookId;
+}
+
+async function deleteExistingWebhook(admin, id) {
+  const response = await admin.graphql(
+    `#graphql
+      mutation webhookSubscriptionDelete($id: ID!) {
+        webhookSubscriptionDelete(id: $id) {
+          userErrors {
+            field
+            message
+          }
+          deletedWebhookSubscriptionId
+        }
+      }`,
+    {
+      variables: {
+        id: id
+      }
+    }
+  );
+
+  const responseJson = await response.json();
+  const deletedSubscriptionId = responseJson?.webhookSubscriptionDelete?.deletedWebhookSubscriptionId;
+  console.log("DELETED webhook subscription: " + deletedSubscriptionId)
+  return deletedSubscriptionId;
 }
