@@ -78,8 +78,11 @@ async function queryOrdersBulkOperation(admin) {
         }
       }
     ); 
-    const { data } = await response.json()
-    const status = await data.bulkOperationRunQuery.bulkOperation.status;
+    const responseJson = await response.json()
+    console.log("userErrors message: " + responseJson.userErrors?.message)
+    console.log("Data: " + responseJson.data)
+    console.log("BulkOperationRunQuery: " + responseJson.data.bulkOperationRunQuery)
+    const status = await responseJson.data.bulkOperationRunQuery.bulkOperation.status;
     console.log("Bulk operation status: " + status);
     return status;
 }
