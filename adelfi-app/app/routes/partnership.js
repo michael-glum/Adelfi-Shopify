@@ -44,26 +44,27 @@ export const action = async ({ request }) => {
 
 
 async function queryOrdersBulkOperation(admin) {
-    const searchQuery = "created_at:2023-10-18 AND discount_code:Adelfi*"
-    const graphqlQuery =
-    `{
-      orders(query: ${searchQuery}) {
-        edges {
-          node {
-            discountCodes
-            netPaymentSet {
-              shopMoney {
-                amount
-              }
-            }
-          }
-        }
-      }
-    }`
     const response = await admin.graphql(
       `#graphql
-        mutation bulkOperationRunQuery($query: String!) {
-          bulkOperationRunQuery(query: $query) {
+        mutation bulkOperationRunQuery() {
+          bulkOperationRunQuery(
+            query: """
+            {
+              orders(query: created_at:2023-10-18 AND discount_code:Adelfi*) {
+                edges {
+                  node {
+                    discountCodes
+                    netPaymentSet {
+                      shopMoney {
+                        amount
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """
+          ) {
             bulkOperation {
               id
               status
@@ -75,9 +76,6 @@ async function queryOrdersBulkOperation(admin) {
           }
         }`,
       {
-        variables: {
-            query: graphqlQuery
-        }
       }
     ); 
     const responseJson = await response.json()
@@ -85,8 +83,8 @@ async function queryOrdersBulkOperation(admin) {
     console.log("userErrors message: " + responseJson.userErrors?.message)
     console.log("Data: " + responseJson.data)
     console.log("BulkOperationRunQuery: " + responseJson.data.bulkOperationRunQuery)
-    console.log("BulkOperation: " + responseJson.data.bulkOperationRunQuery[0].bulkOperation)
-    const status = await responseJson.data.bulkOperationRunQuery[0].bulkOperation.status;
+    console.log("BulkOperation: " + responseJson.data.bulkOperationRunQuery.bulkOperation)
+    const status = await responseJson.data.bulkOperationRunQuery.bulkOperation.status;
     console.log("Bulk operation status: " + status);
     return status;
 }
