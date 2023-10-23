@@ -22,7 +22,7 @@ export const action = async ({ request }) => {
             if (!partnerships) {
                 return json({ message: 'Partnerships not found' }, { status: 404 });
             }
-            
+
             const updateResponses = []
 
             updateResponses.push(partnerships.forEach(async function(partnership) {
@@ -50,7 +50,7 @@ async function queryOrdersBulkOperation(admin) {
           bulkOperationRunQuery(
             query: """
             {
-              orders(query: $searchQuery) {
+              orders(query: """ + $searchQuery + """) {
                 edges {
                   node {
                     discountCodes
@@ -82,5 +82,7 @@ async function queryOrdersBulkOperation(admin) {
       }
     ); 
     const { data } = await response.json()
-    return await data.bulkOperationRunQuery.bulkOperation.status;
+    const status = await data.bulkOperationRunQuery.bulkOperation.status;
+    console.log("Bulk operation status: " + status);
+    return status;
 }
