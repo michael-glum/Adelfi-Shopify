@@ -4,20 +4,20 @@ import { Readable } from 'stream'
 import { createInterface } from 'readline'
 import db from '../db.server'
 
-export const action = async ({ request }) => {
+export async function action ({ request }) {
     //try {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
         console.log("Webhook processing...")
-        const requestBody = await request.text();
-        console.log("Request Body: " + JSON.parse(requestBody));
-        const { topic, shop, session } = await authenticate.webhook(request);
+        const requestJson = await request.json()
+        console.log("Request Body: " + JSON.stringify(requestJson));
+        const { topic, shop, session } = await authenticate.webhook(requestJson);
         const { admin } = await unauthenticated.admin(shop);
         console.log("Webhook from shop: " + shop)
         console.log("Topic: " + topic)
         console.log("Session: " + JSON.stringify(session))
 
-        const { admin_graphql_api_id, status, error_code } = JSON.parse(requestBody);
+        const { admin_graphql_api_id, status, error_code } = requestJson;
         
         console.log("Bulk Operation Status: " + status)
         console.log("Bulk Operation Error Code: " + error_code)
