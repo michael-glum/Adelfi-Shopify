@@ -46,7 +46,7 @@ export const action = async ({ request }) => {
 async function queryOrdersBulkOperation(admin) {
     const response = await admin.graphql(
       `#graphql
-        mutation bulkOperationRunQuery() {
+        mutation {
           bulkOperationRunQuery(
             query: """
             {
