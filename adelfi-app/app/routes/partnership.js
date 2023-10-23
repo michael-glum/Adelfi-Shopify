@@ -85,8 +85,8 @@ async function queryOrdersBulkOperation(admin) {
     console.log("userErrors message: " + responseJson.userErrors?.message)
     console.log("Data: " + responseJson.data)
     console.log("BulkOperationRunQuery: " + responseJson.data.bulkOperationRunQuery)
-    console.log("BulkOperation: " + responseJson.data.bulkOperationRunQuery.bulkOperation)
-    const status = await responseJson.data.bulkOperationRunQuery.bulkOperation.status;
+    console.log("BulkOperation: " + responseJson.data.bulkOperationRunQuery.bulkOperation[0])
+    const status = await responseJson.data.bulkOperationRunQuery.bulkOperation[0].status;
     console.log("Bulk operation status: " + status);
     return status;
 }

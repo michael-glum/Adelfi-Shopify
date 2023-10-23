@@ -680,7 +680,7 @@ async function isExistingWebhook(admin) {
   const response = await admin.graphql(
     `#graphql
       query {
-        webhookSubscriptions(first: 10) {#, topics: BULK_OPERATIONS_FINISH#) {
+        webhookSubscriptions(first: 10, topics: "BULK_OPERATIONS_FINISH") {
           edges {
             node {
               id
