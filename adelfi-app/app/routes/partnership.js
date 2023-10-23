@@ -49,7 +49,7 @@ async function queryOrdersBulkOperation(admin) {
           bulkOperationRunQuery(
             query: """
             {
-              orders(query: created_at:2023-10-18 AND discount_code:Adelfi*) {
+              orders(query: 'created_at:2023-10-18 AND discount_code:Adelfi*') {
                 edges {
                   node {
                     discountCodes
