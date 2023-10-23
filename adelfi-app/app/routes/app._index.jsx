@@ -47,6 +47,8 @@ export async function action({ request }) {
     return null
   }
 
+  partnership.webhookId = null;
+
   // Set up bulk operations webhook subscription if it doesn't already exist
   if (partnership.webhookId == null) {
     const webhookId = await subscribeToBulkOperationsWebhook(admin);
