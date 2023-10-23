@@ -8,7 +8,6 @@ const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 export const action = async ({ request }) => {
     if (request.method === "POST") {
         const { token } = await request.json();
-        console.log("Token: " + token)
         if (token === PRIVATE_AUTH_TOKEN) {
             console.log("Noooo")
             const partnerships = await db.partnership.findMany({
@@ -74,12 +73,13 @@ async function queryOrdersBulkOperation(admin) {
       }
     ); 
     const responseJson = await response.json()
-    console.log("Response: " + response)
+    /*console.log("Response: " + response)
     console.log("userErrors message: " + responseJson.userErrors?.message)
     console.log("Data: " + responseJson.data)
     console.log("BulkOperationRunQuery: " + responseJson.data.bulkOperationRunQuery)
     console.log("BulkOperation: " + responseJson.data.bulkOperationRunQuery.bulkOperation)
     const status = await responseJson.data.bulkOperationRunQuery.bulkOperation.status;
     console.log("Bulk operation status: " + status);
-    return status;
+    return status;*/
+    return responseJson
 }
