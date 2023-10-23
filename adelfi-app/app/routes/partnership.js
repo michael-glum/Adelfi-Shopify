@@ -45,6 +45,21 @@ export const action = async ({ request }) => {
 
 async function queryOrdersBulkOperation(admin) {
     const searchQuery = "(created_at:2023-10-18) AND (discount_code:Adelfi*)"
+    const graphqlQuery =
+    `{
+      orders(query: ${searchQuery}) {
+        edges {
+          node {
+            discountCodes
+            netPaymentSet {
+              shopMoney {
+                amount
+              }
+            }
+          }
+        }
+      }
+    }`
     const response = await admin.graphql(
       `#graphql
         mutation bulkOperationRunQuery($query: String!) {
@@ -61,20 +76,7 @@ async function queryOrdersBulkOperation(admin) {
         }`,
       {
         variables: {
-            query: `{
-              orders(query: ${searchQuery}) {
-                edges {
-                  node {
-                    discountCodes
-                    netPaymentSet {
-                      shopMoney {
-                        amount
-                      }
-                    }
-                  }
-                }
-              }
-            }`
+            query: graphqlQuery
         }
       }
     ); 
