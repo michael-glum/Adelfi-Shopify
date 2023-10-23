@@ -9,13 +9,14 @@ export const action = async ({ request }) => {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
         console.log("Webhook processing...")
-        const { topic, shop, session } = await authenticate.webhook(request);
+        const req = request
+        const { topic, shop, session, } = await authenticate.webhook(req);
         const { admin } = await unauthenticated.admin(shop);
         console.log("Webhook from shop: " + shop)
         console.log("Topic: " + topic)
         console.log("Session: " + session)
 
-        const { admin_graphql_api_id, status, error_code } = await request.json()
+        const { admin_graphql_api_id, status, error_code } = await req.json()
         
         console.log("Bulk Operation Status: " + status)
         console.log("Bulk Operation Error Code: " + error_code)
@@ -42,15 +43,19 @@ export const action = async ({ request }) => {
 
         const response = await admin.graphql(
             `#graphql
-              query {
-                node(id: admin_graphql_api_id) {
+              query getBulkOperationUrl($id: ID!) {
+                node(id: $id) {
                   ... on BulkOperation {
                     url
                     partialDataUrl
                   }
                 }
               }`,
-            {}
+            {
+                variables: {
+                    id: admin_graphql_api_id
+                }
+            }
         );
 
         const { data } = await response.json()
