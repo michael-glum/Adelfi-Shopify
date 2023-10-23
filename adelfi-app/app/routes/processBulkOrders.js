@@ -9,14 +9,15 @@ export const action = async ({ request }) => {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
         console.log("Webhook processing...")
-        const req = request
-        const { topic, shop, session, } = await authenticate.webhook(request);
+        const requestJson = await request.json()
+        console.log()
+        const { topic, shop, session } = await authenticate.webhook(request);
         const { admin } = await unauthenticated.admin(shop);
         console.log("Webhook from shop: " + shop)
         console.log("Topic: " + topic)
         console.log("Session: " + JSON.stringify(session))
 
-        const { admin_graphql_api_id, status, error_code } = await req.json()
+        const { admin_graphql_api_id, status, error_code } = requestJson;
         
         console.log("Bulk Operation Status: " + status)
         console.log("Bulk Operation Error Code: " + error_code)
