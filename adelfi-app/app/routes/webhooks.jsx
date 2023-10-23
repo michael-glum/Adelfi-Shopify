@@ -14,8 +14,9 @@ export const action = async ({ request }) => {
     case "CUSTOMERS_DATA_REQUEST":
     case "CUSTOMERS_REDACT":
     case "SHOP_REDACT":
-    case "BULK_OPERATIONS_FINISH":
+    /*case "BULK_OPERATIONS_FINISH":
       console.log("Bulk Operations Finished")
+      const operationId = request.admin_graphql_api_id*/
     default:
       console.log("Unhandled webhook topic")
       throw new Response("Unhandled webhook topic", { status: 404 });
