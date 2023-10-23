@@ -65,10 +65,10 @@ export async function action ({ request }) {
         const url = (status == "completed") ? dataUrl : partialDataUrl;
         const jsonDataArray = await downloadJsonData(url);
         if (jsonDataArray != null) {
-            console.log("jsonDataArray: " + jsonDataArray.toString())
             let newSales = 0.0;
             for (let i = 0; i < jsonDataArray.length; i++) {
                 const responseJson = jsonDataArray[i];
+                console.log("responseJson: " + JSON.stringify(responseJson))
                 for (const code of responseJson.discountCodes) {
                     if (code.startsWith("Adelfi")) {
                         newSales = newSales + parseFloat(responseJson.netPaymentSet.shopMoney.amount);
