@@ -682,7 +682,7 @@ async function isExistingWebhook(admin) {
   const response = await admin.graphql(
     `#graphql
       query {
-        webhookSubscriptions(first: 10, topics: "[BULK_OPERATIONS_FINISH]") {
+        webhookSubscriptions(first: 10) {
           edges {
             node {
               id
@@ -706,14 +706,16 @@ async function isExistingWebhook(admin) {
     return null
   }
   for (let i = 0; i < responseJson.data.webhookSubscriptions.edges.length; i++) {
-    const id = responseJson.data.webhookSubscriptions.edges[i].node.id
-    console.log("id: " + id);
     const topic = responseJson.data.webhookSubscriptions.edges[i].node.topic
     console.log("topic: " + topic);
-    const callbackUrl = responseJson.data.webhookSubscriptions.edges[i].node.endpoint.callbackUrl
-    console.log("callbackUrl: " + callbackUrl);
-    if (callbackUrl.substring(callbackUrl.lastIndexOf("/")) == "/processBulkOrders") {
-      return id
+    if (topic == "BULK_OPERATIONS_FINISH") {
+      const id = responseJson.data.webhookSubscriptions.edges[i].node.id
+      console.log("id: " + id);
+      const callbackUrl = responseJson.data.webhookSubscriptions.edges[i].node.endpoint.callbackUrl
+      console.log("callbackUrl: " + callbackUrl);
+      if (callbackUrl.substring(callbackUrl.lastIndexOf("/")) == "/processBulkOrders") {
+        return id
+      }
     }
   }
   return null;
