@@ -4,6 +4,7 @@ import { unauthenticated } from "../shopify.server";
 import nodemailer from "nodemailer";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
+const EMAIL_PASS = process.env.EMAIL_PASS;
 const ORDER_GRACE_PERIOD = 6;
 const UPDATE_SALES_TASK = "UPDATE_SALES"
 const COLLECT_COMMISSIONS_TASK = "COLLECT_COMMISSIONS"
@@ -130,12 +131,12 @@ async function sendEmail(shop, commission) {
       service: "Gmail",
       auth: {
         user: "mglum@adelfi.shop",
-        pass: process.env.EMAIL_PASS,
+        pass: EMAIL_PASS,
       },
     });
 
     const mailOptions = {
-      from: "Adelfi Commission Tracker",
+      from: "commissions@adelfi.shop",
       to: "mglum@adelfi.shop",
       subject: "Commissions owed by " + shop,
       text: "Shop: " + shop + "\nCommissions Owed: $" + commission,
