@@ -37,4 +37,5 @@ model Partnership {
   currSales   Float     @default(0)
   webhookId   String?
   lastUpdated String?
+  lastPayment Float?
 }

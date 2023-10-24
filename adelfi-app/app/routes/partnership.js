@@ -1,23 +1,28 @@
 import { json } from "@remix-run/node";
 import db from "../db.server"
 import { unauthenticated } from "../shopify.server";
+import emailjs from "emailjs-com";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 const ORDER_GRACE_PERIOD = 6;
+const UPDATE_SALES_TASK = "UPDATE_SALES"
+const COLLECT_COMMISSIONS_TASK = "COLLECT_COMMISSIONS"
 
 // yighay
 export const action = async ({ request }) => {
     if (request.method === "POST") {
-        const { token } = await request.json();
+        const { token, task } = await request.json();
         if (token === PRIVATE_AUTH_TOKEN) {
             console.log("Noooo")
             const partnerships = await db.partnership.findMany({
                 select: {
                     shop: true,
                     discountId: true,
+                    commission: true,
                     totalSales: true,
                     currSales: true,
-                    lastUpdated: true
+                    lastUpdated: true,
+                    lastPayment: true
                 }
             });
             if (!partnerships) {
@@ -28,11 +33,26 @@ export const action = async ({ request }) => {
             const today = getDateXDaysAgo(0);
 
             updateResponses.push(partnerships.forEach(async function(partnership) {
-                if (partnership.lastUpdated != today) {
+                if (partnership.lastUpdated != today || task === COLLECT_COMMISSIONS_TASK) {
                     if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
-                        const { admin } = await unauthenticated.admin(partnership.shop);
-                        const bulkOpResponse = await queryOrdersBulkOperation(admin);
-                        console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
+                        if (task === UPDATE_SALES_TASK) {
+                          const { admin } = await unauthenticated.admin(partnership.shop);
+                          const bulkOpResponse = await queryOrdersBulkOperation(admin);
+                          console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
+                        } else if (task === COLLECT_COMMISSIONS_TASK) {
+                          const currSales = partnership.currSales;
+                          console.log("currSales for shop: " + partnership.shop + " is " + currSales);
+                          partnership.lastPayment = (Math.floor(currSales * partnership.commission * 100) / 100).toFixed(2)
+                          partnership.currSales = 0;
+                          sendEmail(partnership.shop, partnership.lastPayment)
+                          const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
+                          if (updateResponse.count === 0) {
+                            console.error("Error: Couldn't update partnership.currSales in db for shop: " + partnership.shop);
+                            return null;
+                        } else {
+                            console.log("Partnership db currSales updated for shop: " + partnership.shop);
+                        }
+                        }
                     } else {
                         console.log("No discountId attached to this shop: " + partnership.shop)
                     }
@@ -101,4 +121,27 @@ function getDateXDaysAgo(x) {
   const year = t.getFullYear();
   console.log("Date " + x + " days ago: " + `${year}-${month}-${date}`)
   return `${year}-${month}-${date}`;
+}
+
+async function sendEmail(shop, commission) {
+  emailjs.init("mglum@adelfi.shop")
+
+  const templateParams = {
+    shop_name: shop,
+    commissions_owed: commission,
+  }
+
+  emailjs
+  .send(
+    "service_ge05evf",
+    "template_cfzq4ll",
+    templateParams,
+    process.env.EMAIL_JS_PUBLIC_KEY,
+  )
+  .then((response) => {
+    console.log("Email sent successfully:", response);
+  })
+  .catch((error) => {
+    console.error("Email sending failed:", error);
+  })
 }

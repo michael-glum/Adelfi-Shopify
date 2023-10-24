@@ -2,12 +2,12 @@ import { defer } from "@defer/client"
 import { json } from "@remix-run/node";
 
 const API_BASE_URL = "https://adelfi.fly.dev/";
-const UPDATE_SALES_TASK = "UPDATE_SALES"
+const COLLECT_COMMISSIONS_TASK = "COLLECT_COMMISSIONS"
 
-async function updateSales() {
+async function collectCommissions() {
     const requestBody = {
         token: process.env.PRIVATE_AUTH_TOKEN,
-        task: UPDATE_SALES_TASK
+        task: COLLECT_COMMISSIONS_TASK
     }
     console.log(requestBody.token);
     const response = await fetch(`${API_BASE_URL}partnership`, {
@@ -21,4 +21,4 @@ async function updateSales() {
     return response
 }
 
-export default defer.cron(updateSales, "42 20 * * *");
+export default defer.cron(collectCommissions, "12 22 * * *"/*"0 0 1 * *"*/);
