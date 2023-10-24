@@ -3,6 +3,7 @@ import db from "../db.server"
 import { unauthenticated } from "../shopify.server";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
+const ORDER_GRACE_PERIOD = 30;
 
 // yighay
 export const action = async ({ request }) => {
@@ -15,7 +16,8 @@ export const action = async ({ request }) => {
                     shop: true,
                     discountId: true,
                     totalSales: true,
-                    currSales: true
+                    currSales: true,
+                    lastUpdated: true
                 }
             });
             if (!partnerships) {
@@ -23,14 +25,19 @@ export const action = async ({ request }) => {
             }
 
             const updateResponses = []
+            const today = getDateXDaysAgo(0);
 
             updateResponses.push(partnerships.forEach(async function(partnership) {
-                if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
-                    const { admin } = await unauthenticated.admin(partnership.shop);
-                    const bulkOpResponse = await queryOrdersBulkOperation(admin);
-                    console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
+                if (partnership.lastUpdated != today) {
+                    if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
+                        const { admin } = await unauthenticated.admin(partnership.shop);
+                        const bulkOpResponse = await queryOrdersBulkOperation(admin);
+                        console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
+                    } else {
+                        console.log("No discountId attached to this shop: " + partnership.shop)
+                    }
                 } else {
-                    return json({ error: "No discountId attached to this shop" })
+                  console.log("Commission already calculated today for: " + partnership.shop);
                 }
             }));
             return json({updateResponses: updateResponses})
@@ -43,13 +50,14 @@ export const action = async ({ request }) => {
 
 
 async function queryOrdersBulkOperation(admin) {
+    const queryDate = getDateXDaysAgo(ORDER_GRACE_PERIOD);
     const response = await admin.graphql(
       `#graphql
-        mutation {
+        mutation queryOrders($queryDate: String!) {
           bulkOperationRunQuery(
             query: """
             {
-              orders(query: "created_at:2023-10-18 AND discount_code:Adelfi*") {
+              orders(query: "created_at:${queryDate} AND discount_code:Adelfi*") {
                 edges {
                   node {
                     discountCodes
@@ -75,16 +83,21 @@ async function queryOrdersBulkOperation(admin) {
           }
         }`,
       {
+        variables: {
+          queryDate: queryDate,
+        }
       }
     ); 
     const responseJson = await response.json()
-    /*console.log("Response: " + response)
-    console.log("userErrors message: " + responseJson.userErrors?.message)
-    console.log("Data: " + responseJson.data)
-    console.log("BulkOperationRunQuery: " + responseJson.data.bulkOperationRunQuery)
-    console.log("BulkOperation: " + responseJson.data.bulkOperationRunQuery.bulkOperation)
-    const status = await responseJson.data.bulkOperationRunQuery.bulkOperation.status;
-    console.log("Bulk operation status: " + status);
-    return status;*/
     return responseJson
+}
+
+function getDateXDaysAgo(x) {
+  var t = new Date();
+  t.setDate(t.getDate() - x)
+  const date = ('0' + t.getDate()).slice(-2);
+  const month = ('0' + (t.getMonth() + 1)).slice(-2);
+  const year = t.getFullYear();
+  console.log("Date " + x + " days ago: " + `${year}-${month}-${date}`)
+  return `${year}-${month}-${date}`;
 }
