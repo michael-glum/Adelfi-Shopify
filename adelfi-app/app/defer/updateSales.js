@@ -19,4 +19,4 @@ async function updateSales() {
     return response
 }
 
-export default defer(updateSales);
+export default defer.cron(updateSales, "35 4 * * *");
