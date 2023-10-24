@@ -51,26 +51,27 @@ export const action = async ({ request }) => {
 
 async function queryOrdersBulkOperation(admin) {
     const queryDate = getDateXDaysAgo(ORDER_GRACE_PERIOD);
-    const response = await admin.graphql(
-      `#graphql
-        mutation queryOrders($queryDate: String!) {
-          bulkOperationRunQuery(
-            query: """
-            {
-              orders(query: "created_at:" $queryDate " AND discount_code:Adelfi*") {
-                edges {
-                  node {
-                    discountCodes
-                    netPaymentSet {
-                      shopMoney {
-                        amount
-                      }
-                    }
-                  }
-                }
+    const query = `
+    {
+      orders(query: "created_at:${queryDate} AND discount_code:Adelfi*") {
+        edges {
+          node {
+            discountCodes
+            netPaymentSet {
+              shopMoney {
+                amount
               }
             }
-            """
+          }
+        }
+      }
+    }
+    `
+    const response = await admin.graphql(
+      `#graphql
+        mutation queryOrders($query: String!) {
+          bulkOperationRunQuery(
+            query: $query
           ) {
             bulkOperation {
               id
@@ -84,7 +85,7 @@ async function queryOrdersBulkOperation(admin) {
         }`,
       {
         variables: {
-          queryDate: queryDate,
+          query: query,
         }
       }
     ); 
