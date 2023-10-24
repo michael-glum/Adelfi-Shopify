@@ -28,7 +28,7 @@ export const action = async ({ request }) => {
             const today = getDateXDaysAgo(0);
 
             updateResponses.push(partnerships.forEach(async function(partnership) {
-                if (partnership.lastUpdated != today) {
+                //if (partnership.lastUpdated != today) {
                     if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
                         const { admin } = await unauthenticated.admin(partnership.shop);
                         const bulkOpResponse = await queryOrdersBulkOperation(admin);
@@ -36,9 +36,9 @@ export const action = async ({ request }) => {
                     } else {
                         console.log("No discountId attached to this shop: " + partnership.shop)
                     }
-                } else {
-                  console.log("Commission already calculated today for: " + partnership.shop);
-                }
+                //} else {
+                  //console.log("Commission already calculated today for: " + partnership.shop);
+                //}
             }));
             return json({updateResponses: updateResponses})
         } else {
