@@ -41,15 +41,11 @@ export const action = async ({ request }) => {
                           console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
                         } else if (task === COLLECT_COMMISSIONS_TASK) {
                           const currSales = parseFloat((Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2))
-                          console.log("currSales for shop: " + partnership.shop + " is " + partnership.currSales);
-                          partnership.lastPayment = currSales
+                          console.log("currSales for shop: " + partnership.shop + " is " + currSales);
+                          //partnership.lastPayment = currSales
                           partnership.currSales = 0;
-                          try {
-                            const emailResponse = await sendEmail(partnership.shop, currSales)
-                            console.log("Email sent successfully:", JSON.stringify(emailResponse));
-                          } catch (error) {
-                            console.error("Email sending failed:", error);
-                          }
+                          const emailResponse = await sendEmail(partnership.shop, partnership.lastPayment)
+                          console.log("Email response:", JSON.stringify(emailResponse));
                           const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
                           if (updateResponse.count === 0) {
                             console.error("Error: Couldn't update partnership.currSales in db for shop: " + partnership.shop);
@@ -133,16 +129,16 @@ async function sendEmail(shop, commission) {
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "mglum@adelfi.com",
+        user: "mglum@adelfi.shop",
         pass: process.env.EMAIL_PASS,
       },
     });
 
     const mailOptions = {
       from: "Adelfi Commission Tracker",
-      to: "mglum@adelfi.com",
+      to: "mglum@adelfi.shop",
       subject: "Commissions owed by " + shop,
-      text: "Shop: " + shop + "\nCommissions Owed: " + commission,
+      text: "Shop: " + shop + "\nCommissions Owed: $" + commission,
     };
 
     const info = await transporter.sendMail(mailOptions);
