@@ -3,7 +3,7 @@ import db from "../db.server"
 import { unauthenticated } from "../shopify.server";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
-const ORDER_GRACE_PERIOD = 30;
+const ORDER_GRACE_PERIOD = 6;
 
 // yighay
 export const action = async ({ request }) => {
