@@ -1,7 +1,7 @@
 import { json } from "@remix-run/node";
 import db from "../db.server"
 import { unauthenticated } from "../shopify.server";
-import emailjs from "emailjs-com";
+import nodemailer from "nodemailer";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 const ORDER_GRACE_PERIOD = 6;
@@ -40,11 +40,16 @@ export const action = async ({ request }) => {
                           const bulkOpResponse = await queryOrdersBulkOperation(admin);
                           console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
                         } else if (task === COLLECT_COMMISSIONS_TASK) {
-                          const currSales = partnership.currSales;
-                          console.log("currSales for shop: " + partnership.shop + " is " + currSales);
-                          partnership.lastPayment = (Math.floor(currSales * partnership.commission * 100) / 100).toFixed(2)
+                          const currSales = parseFloat((Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2))
+                          console.log("currSales for shop: " + partnership.shop + " is " + partnership.currSales);
+                          partnership.lastPayment = currSales
                           partnership.currSales = 0;
-                          sendEmail(partnership.shop, partnership.lastPayment)
+                          try {
+                            const emailResponse = await sendEmail(partnership.shop, currSales)
+                            console.log("Email sent successfully:", JSON.stringify(emailResponse));
+                          } catch (error) {
+                            console.error("Email sending failed:", error);
+                          }
                           const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
                           if (updateResponse.count === 0) {
                             console.error("Error: Couldn't update partnership.currSales in db for shop: " + partnership.shop);
@@ -124,24 +129,27 @@ function getDateXDaysAgo(x) {
 }
 
 async function sendEmail(shop, commission) {
-  emailjs.init("mglum@adelfi.shop")
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: "mglum@adelfi.com",
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-  const templateParams = {
-    shop_name: shop,
-    commissions_owed: commission,
+    const mailOptions = {
+      from: "Adelfi Commission Tracker",
+      to: "mglum@adelfi.com",
+      subject: "Commissions owed by " + shop,
+      text: "Shop: " + shop + "\nCommissions Owed: " + commission,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    return json({ message: "Email sent successfully", info });
+  } catch (error) {
+    console.error("Email sending failed", error);
+    return json({ error: "Email sending failed", details: error });
   }
-
-  emailjs
-  .send(
-    "service_ge05evf",
-    "template_cfzq4ll",
-    templateParams,
-    process.env.EMAIL_JS_PUBLIC_KEY,
-  )
-  .then((response) => {
-    console.log("Email sent successfully:", response);
-  })
-  .catch((error) => {
-    console.error("Email sending failed:", error);
-  })
 }
