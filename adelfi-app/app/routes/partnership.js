@@ -53,6 +53,11 @@ async function queryOrdersBulkOperation(admin) {
                 edges {
                   node {
                     discountCodes
+                    netPaymentSet {
+                      shopMoney {
+                        amount
+                      }
+                    }
                   }
                 }
               }
