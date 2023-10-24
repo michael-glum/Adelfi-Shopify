@@ -27,7 +27,8 @@ export async function action ({ request }) {
             select: {
                 discountId: true,
                 totalSales: true,
-                currSales: true
+                currSales: true,
+                lastUpdated: true
             }
         });
 
@@ -80,6 +81,12 @@ export async function action ({ request }) {
             partnership.totalSales = partnership.totalSales + newSales;
             partnership.currSales = partnership.currSales + newSales;
             try {
+                const today = getCurrentDate();
+                if (partnership.lastUpdated === today) {
+                    console.log("Commission already calculated today");
+                    return null;
+                }
+                partnership.lastUpdated = today;
                 const updateResponse = await db.partnership.updateMany({ where: { shop: shop}, data: { ...partnership }})
                 if (updateResponse.count === 0) {
                     console.error("Error: Couldn't update partnership in db for shop: " + shop);
@@ -145,4 +152,12 @@ async function downloadJsonData(url) {
         console.log('Failed to fetch data. Response: ' + response.status)
         return null
     }
+}
+
+function getCurrentDate() {
+    const t = new Date();
+    const date = ('0' + t.getDate()).slice(-2);
+    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+    const year = t.getFullYear();
+    return `${year}-${month}-${date}`;
 }
