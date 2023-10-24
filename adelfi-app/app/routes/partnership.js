@@ -41,19 +41,7 @@ export const action = async ({ request }) => {
                           const bulkOpResponse = await queryOrdersBulkOperation(admin);
                           console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
                         } else if (task === COLLECT_COMMISSIONS_TASK) {
-                          const currSales = parseFloat((Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2))
-                          console.log("currSales for shop: " + partnership.shop + " is " + currSales);
-                          //partnership.lastPayment = currSales
-                          partnership.currSales = 0;
-                          const emailResponse = await sendEmail(partnership.shop, partnership.lastPayment)
-                          console.log("Email response:", JSON.stringify(emailResponse));
-                          const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
-                          if (updateResponse.count === 0) {
-                            console.error("Error: Couldn't update partnership.currSales in db for shop: " + partnership.shop);
-                            return null;
-                        } else {
-                            console.log("Partnership db currSales updated for shop: " + partnership.shop);
-                        }
+                          await collectCommissions(partnership);
                         }
                     } else {
                         console.log("No discountId attached to this shop: " + partnership.shop)
@@ -136,10 +124,10 @@ async function sendEmail(shop, commission) {
     });
 
     const mailOptions = {
-      from: "commissions@adelfi.shop",
+      from: "mglum@adelfi.shop",
       to: "mglum@adelfi.shop",
       subject: "Commissions owed by " + shop,
-      text: "Shop: " + shop + "\nCommissions Owed: $" + commission,
+      text: "Shop: " + shop + "\nCommissions Owed: $" + commission + "\n\n(Automatic Commission Tracker)",
     };
 
     const info = await transporter.sendMail(mailOptions);
@@ -148,5 +136,21 @@ async function sendEmail(shop, commission) {
   } catch (error) {
     console.error("Email sending failed", error);
     return json({ error: "Email sending failed", details: error });
+  }
+}
+
+async function collectCommissions(partnership) {
+  const currSales = parseFloat((Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2))
+  console.log("currSales for shop: " + partnership.shop + " is " + currSales);
+  partnership.lastPayment = currSales
+  partnership.currSales = 0;
+  const emailResponse = await sendEmail(partnership.shop, currSales)
+  console.log("Email response:", JSON.stringify(emailResponse));
+  const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
+  if (updateResponse.count === 0) {
+    console.error("Error: Couldn't update partnership.currSales in db for shop: " + partnership.shop);
+    return null;
+  } else {
+    console.log("Partnership db currSales updated for shop: " + partnership.shop);
   }
 }
