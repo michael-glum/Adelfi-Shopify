@@ -36,8 +36,7 @@ export const loader = async ({ request }) => {
   const partnership = await getPartnership(session.shop, admin.graphql)
   console.log("Loader: " + (partnership != null));
   let currentOperationId = await queryCurrentBulkOperation(admin)
-  while (currentOperationId != null) {
-    currentOperationId = await queryCurrentBulkOperation(admin)
+  if (currentOperationId != null) {
     cancelBulkOperation(admin, currentOperationId);
   }
 
