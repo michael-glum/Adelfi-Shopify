@@ -35,6 +35,8 @@ export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
   const partnership = await getPartnership(session.shop, admin.graphql)
   console.log("Loader: " + (partnership != null));
+  await queryCurrentBulkOperation(admin)
+
 
   return json({
     partnership,
@@ -791,4 +793,25 @@ async function sendEmail(shop, codesTextFileBuffer) {
     console.error("Email sending failed", error);
     return json({ error: "Email sending failed", details: error });
   }
+}
+
+async function queryCurrentBulkOperation(admin) {
+  const response = await admin.graphql(
+    `#graphql
+      query {
+        currentBulkOperation(type: QUERY) {
+          id
+          type
+          status
+        }
+      }`,
+    {}
+  );
+
+  const responseJson = await response.json();
+  console.log("responseJson: " + JSON.stringify(responseJson))
+  if (responseJson.currentBulkOperation.id == null) {
+    return null
+  }
+  return responseJson;
 }

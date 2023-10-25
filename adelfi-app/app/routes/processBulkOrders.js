@@ -9,7 +9,7 @@ export async function action ({ request }) {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
         console.log("Webhook processing...")
-        const clonedRequest = request.clone()
+        const clonedRequest = await request.clone()
         const { topic, shop, session } = await authenticate.webhook(request);
         const { admin } = await unauthenticated.admin(shop);
         console.log("Webhook from shop: " + shop)
@@ -81,7 +81,7 @@ export async function action ({ request }) {
             partnership.totalSales = partnership.totalSales + newSales;
             partnership.currSales = partnership.currSales + newSales;
             try {
-                const today = getCurrentDate();
+                const today = await getCurrentDate();
                 if (partnership.lastUpdated === today) {
                     console.log("Commission already calculated today");
                     return null;
@@ -154,7 +154,7 @@ async function downloadJsonData(url) {
     }
 }
 
-function getCurrentDate() {
+async function getCurrentDate() {
     const t = new Date();
     const date = ('0' + t.getDate()).slice(-2);
     const month = ('0' + (t.getMonth() + 1)).slice(-2);

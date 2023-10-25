@@ -31,7 +31,7 @@ export const action = async ({ request }) => {
             }
 
             const updateResponses = []
-            const today = getDateXDaysAgo(0);
+            const today = await getDateXDaysAgo(0);
 
             updateResponses.push(partnerships.forEach(async function(partnership) {
                 if (partnership.lastUpdated != today || task === COLLECT_COMMISSIONS_TASK) {
@@ -60,7 +60,7 @@ export const action = async ({ request }) => {
 
 
 async function queryOrdersBulkOperation(admin) {
-    const queryDate = getDateXDaysAgo(ORDER_GRACE_PERIOD);
+    const queryDate = await getDateXDaysAgo(ORDER_GRACE_PERIOD);
     const query = `
     {
       orders(query: "created_at:${queryDate} AND discount_code:Adelfi*") {
@@ -103,7 +103,7 @@ async function queryOrdersBulkOperation(admin) {
     return responseJson
 }
 
-function getDateXDaysAgo(x) {
+async function getDateXDaysAgo(x) {
   var t = new Date();
   t.setDate(t.getDate() - x)
   const date = ('0' + t.getDate()).slice(-2);
