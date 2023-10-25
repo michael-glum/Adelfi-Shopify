@@ -29,7 +29,7 @@ const endDate = "2023-11-28T12:00:00Z";
 const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
 const codePrefix = "Adelfi-"
 const BASE_URL = "https://adelfi.fly.dev/";
-const EMAIL_PASS = process.env.EMAIL_PASS;
+//const EMAIL_PASS = process.env.EMAIL_PASS;
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
