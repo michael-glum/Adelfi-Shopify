@@ -1,7 +1,7 @@
 import { json } from "@remix-run/node";
 import sendEmail from './sendEmail';
 
-export const loader = async ({ request }) => {
+export const action = async ({ request }) => {
   if (request.method === 'POST') {
     // Get data from the client
     const { shop, content, hasAttachment } = request.body;
