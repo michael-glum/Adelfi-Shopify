@@ -4,7 +4,7 @@ import sendEmail from './sendEmail';
 export const action = async ({ request }) => {
   if (request.method === 'POST') {
     // Get data from the client
-    const { shop, content, hasAttachment } = request.body;
+    const { shop, content, hasAttachment } = await request.json();
 
     // Call email sending function
     const emailResult = await sendEmail(shop, content, hasAttachment);

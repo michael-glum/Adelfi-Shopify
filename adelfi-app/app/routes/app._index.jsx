@@ -281,7 +281,7 @@ export default function Index() {
                           >
                             <VerticalStack gap="2">
                               <Text as="h1" variant="headingMd" alignment="center">
-                                Total Sales (All Time)
+                                All Time Earnings
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
                                 ${partnership.totalSales.toFixed(2)} USD
@@ -298,7 +298,7 @@ export default function Index() {
                           >
                             <VerticalStack gap="2">
                               <Text as="h1" variant="headingMd" alignment="center">
-                                Commissions (Period)
+                                Current Commissions
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
                                 ${(Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2)} USD
