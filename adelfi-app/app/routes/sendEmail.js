@@ -25,7 +25,7 @@ export default async function sendEmail(shop, content, hasAttachment) {
         attachments: [
             {
             filename: shop + "_codes.txt",
-            content: Buffer.from(content),
+            content: content.join("\n"),
             }
         ]
         } : {
