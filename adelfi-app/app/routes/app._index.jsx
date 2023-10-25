@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { json } from "@remix-run/node";
-//import nodemailer from "nodemailer";
 import { useActionData, useNavigation, useSubmit, useLoaderData } from "@remix-run/react";
 import {
   Page,
@@ -21,6 +20,7 @@ import {
 
 import { getPartnership } from "~/models/partnership.server";
 import db from "../db.server";
+import sendEmail from "./sendEmail";
 
 import { authenticate } from "../shopify.server";
 
@@ -29,16 +29,10 @@ const endDate = "2023-11-28T12:00:00Z";
 const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
 const codePrefix = "Adelfi-"
 const BASE_URL = "https://adelfi.fly.dev/";
-//const EMAIL_PASS = process.env.EMAIL_PASS;
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
   const partnership = await getPartnership(session.shop, admin.graphql)
-  console.log("Loader: " + (partnership != null));
-  let currentOperationId = await queryCurrentBulkOperation(admin)
-  if (currentOperationId != null) {
-    cancelBulkOperation(admin, currentOperationId);
-  }
 
   return json({
     partnership,
@@ -69,9 +63,9 @@ export async function action({ request }) {
 
   const codesArray = generateCodesArray(numDiscounts, codeLength)
   console.log("We're here...")
-  //const codesTextFile = arrayToTextFile(codesArray)
-  //const codesTextFileBuffer = Buffer.from(await codesTextFile.text())
-  //console.log("Email response: " + JSON.stringify(await sendEmail(shop.split(".")[0], codesTextFileBuffer)))
+  const codesTextFile = arrayToTextFile(codesArray)
+  const codesTextFileBuffer = Buffer.from(await codesTextFile.text())
+  console.log("Email response: " + JSON.stringify(await sendEmail(shop.split(".")[0], codesTextFileBuffer, true)))
 
   partnership.codes = Buffer.from(JSON.stringify(codesArray), "utf-8")
 

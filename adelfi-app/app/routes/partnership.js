@@ -2,6 +2,7 @@ import { json } from "@remix-run/node";
 import db from "../db.server"
 import { unauthenticated } from "../shopify.server";
 import nodemailer from "nodemailer";
+import sendEmail from "./sendEmail";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 const EMAIL_PASS = process.env.EMAIL_PASS;
@@ -113,7 +114,7 @@ async function getDateXDaysAgo(x) {
   return `${year}-${month}-${date}`;
 }
 
-async function sendEmail(shop, commission) {
+/*async function sendEmail(shop, commission) {
   try {
     const transporter = nodemailer.createTransport({
       service: "Gmail",
@@ -137,14 +138,14 @@ async function sendEmail(shop, commission) {
     console.error("Email sending failed", error);
     return json({ error: "Email sending failed", details: error });
   }
-}
+}*/
 
 async function collectCommissions(partnership) {
   const currSales = parseFloat((Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2))
   console.log("currSales for shop: " + partnership.shop + " is " + currSales);
   partnership.lastPayment = currSales
   partnership.currSales = 0;
-  const emailResponse = await sendEmail(partnership.shop, currSales)
+  const emailResponse = await sendEmail(partnership.shop, currSales, false)
   console.log("Email response:", JSON.stringify(emailResponse));
   const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
   if (updateResponse.count === 0) {
