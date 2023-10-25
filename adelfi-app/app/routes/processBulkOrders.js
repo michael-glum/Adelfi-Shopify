@@ -5,7 +5,7 @@ import { createInterface } from 'readline'
 import db from '../db.server'
 
 export async function action ({ request }) {
-    //try {
+    try {
         // Verify the authenticity of the incoming request.
         // Parse and process the webhook payload.
         console.log("Webhook processing...")
@@ -39,7 +39,7 @@ export async function action ({ request }) {
 
         if (partnership.discountId == null || partnership.totalSales == null || partnership.currSales == null) {
             console.log('Partnership table not properly initiliazed for shop: ' + shop);
-            return null;
+            return json({ success: true }, { status: 200 });
         }
 
         const response = await admin.graphql(
@@ -84,30 +84,30 @@ export async function action ({ request }) {
                 const today = await getCurrentDate();
                 if (partnership.lastUpdated === today) {
                     console.log("Commission already calculated today");
-                    return null;
+                    return json({ success: true }, { status: 200 });
                 }
                 partnership.lastUpdated = today;
                 const updateResponse = await db.partnership.updateMany({ where: { shop: shop}, data: { ...partnership }})
                 if (updateResponse.count === 0) {
                     console.error("Error: Couldn't update partnership in db for shop: " + shop);
-                    return null;
+                    return json({ success: true }, { status: 200 });
                 } else {
                     console.log("Partnership db updated for shop: " + shop);
                 }
             } catch (error) {
                 console.error("Error updating partnerships for shop: " + shop, error);
-                return null;
+                return json({ success: true }, { status: 200 });
             }
         }
 
         // Respond with a success status.
         console.log("Successfully processed bulk orders webhook")
-        return json({ success: true });
-    /*} catch (error) {
+        return json({ success: true }, { status: 200 });
+    } catch (error) {
         console.error('Error processing the webhook:', error);
         // Handle the error and respond accordingly.
         return json({ error: 'Webhook processing failed' }, { status: 400 });
-    }*/
+    }
 };
 
 async function downloadJsonData(url) {

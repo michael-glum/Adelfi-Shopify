@@ -204,7 +204,7 @@ export default function Index() {
     }, [discountId]);
 
     const generateDiscount = () => {
-      console.log('Activate Partnership button clicked.')
+      console.log('Action button clicked.')
       submit({}, { replace: true, method: "POST" })
     };
 
@@ -326,7 +326,7 @@ export default function Index() {
                         If you wish to discontinue your partnership, contact Adelfi before the start of the next period. Your service will be terminated once the current period has expired.
                       </Text>
                       <Text as="p" variant="bodyMd">
-                        Upon recieving a commission invoice at the end of a period, the amount must be payed in full before the end of the next period or your service will be immediately terminated.
+                        Upon recieving a commission invoice at the end of a period, the amount must be payed in full before the end of the next period or your service will be terminated.
                       </Text>
                     </VerticalStack>
                   </VerticalStack>
