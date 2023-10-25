@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { json } from "@remix-run/node";
-import nodemailer from "nodemailer";
+//import nodemailer from "nodemailer";
 import { useActionData, useNavigation, useSubmit, useLoaderData } from "@remix-run/react";
 import {
   Page,
@@ -69,9 +69,9 @@ export async function action({ request }) {
 
   const codesArray = generateCodesArray(numDiscounts, codeLength)
   console.log("We're here...")
-  const codesTextFile = arrayToTextFile(codesArray)
-  const codesTextFileBuffer = Buffer.from(await codesTextFile.text())
-  console.log("Email response: " + JSON.stringify(await sendEmail(shop.split(".")[0], codesTextFileBuffer)))
+  //const codesTextFile = arrayToTextFile(codesArray)
+  //const codesTextFileBuffer = Buffer.from(await codesTextFile.text())
+  //console.log("Email response: " + JSON.stringify(await sendEmail(shop.split(".")[0], codesTextFileBuffer)))
 
   partnership.codes = Buffer.from(JSON.stringify(codesArray), "utf-8")
 
@@ -765,37 +765,37 @@ async function deleteExistingWebhook(admin, id) {
   return deletedSubscriptionId;
 }
 
-async function sendEmail(shop, codesTextFileBuffer) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: "mglum@adelfi.shop",
-        pass: EMAIL_PASS,
-      },
-    });
+// async function sendEmail(shop, codesTextFileBuffer) {
+//   try {
+//     const transporter = nodemailer.createTransport({
+//       service: "Gmail",
+//       auth: {
+//         user: "mglum@adelfi.shop",
+//         pass: EMAIL_PASS,
+//       },
+//     });
 
-    const mailOptions = {
-      from: "mglum@adelfi.shop",
-      to: "mglum@adelfi.shop",
-      subject: "Discounts for " + shop,
-      text: "Shop: " + shop + "\n\n(Automatic Discount Generator)",
-      attachments: [
-        {
-          filename: shop + "_codes.txt",
-          content: codesTextFileBuffer,
-        }
-      ]
-    };
+//     const mailOptions = {
+//       from: "mglum@adelfi.shop",
+//       to: "mglum@adelfi.shop",
+//       subject: "Discounts for " + shop,
+//       text: "Shop: " + shop + "\n\n(Automatic Discount Generator)",
+//       attachments: [
+//         {
+//           filename: shop + "_codes.txt",
+//           content: codesTextFileBuffer,
+//         }
+//       ]
+//     };
 
-    const info = await transporter.sendMail(mailOptions);
+//     const info = await transporter.sendMail(mailOptions);
 
-    return json({ message: "Email sent successfully", info });
-  } catch (error) {
-    console.error("Email sending failed", error);
-    return json({ error: "Email sending failed", details: error });
-  }
-}
+//     return json({ message: "Email sent successfully", info });
+//   } catch (error) {
+//     console.error("Email sending failed", error);
+//     return json({ error: "Email sending failed", details: error });
+//   }
+// }
 
 async function queryCurrentBulkOperation(admin) {
   const response = await admin.graphql(
