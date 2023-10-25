@@ -35,8 +35,11 @@ export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
   const partnership = await getPartnership(session.shop, admin.graphql)
   console.log("Loader: " + (partnership != null));
-  await queryCurrentBulkOperation(admin)
-
+  let currentOperationId = await queryCurrentBulkOperation(admin)
+  while (currentOperationId != null) {
+    currentOperationId = await queryCurrentBulkOperation(admin)
+    cancelBulkOperation(admin, currentOperationId);
+  }
 
   return json({
     partnership,
@@ -810,8 +813,31 @@ async function queryCurrentBulkOperation(admin) {
 
   const responseJson = await response.json();
   console.log("responseJson: " + JSON.stringify(responseJson))
-  if (responseJson.currentBulkOperation.id == null) {
+  if (responseJson.data.currentBulkOperation.id == null) {
     return null
   }
-  return responseJson;
+  return responseJson.data.currentBulkOperation.id;
+}
+
+async function cancelBulkOperation(admin, id) {
+  const response = await admin.graphql(
+    `#graphql
+      mutation bulkOperationCancel($id: ID!) {
+        bulkOperationCancel(id: $id) {
+          bulkOperation{
+            id
+          }
+        }
+      }`,
+    {
+      variables: {
+        id: id
+      }
+    }
+  );
+
+  const responseJson = await response.json();
+  const cancelledOperationId = responseJson?.data?.bulkOperationCancel.bulkOperation.id;
+  console.log("CANCELLED bulk operation: " + cancelledOperationId)
+  return cancelledOperationId;
 }
