@@ -798,7 +798,7 @@ async function sendEmailToServer(shop, content, hasAttachment) {
   };
 
   try {
-    const response = await fetch('/emailServer', {
+    const response = await fetch(`${BASE_URL}emailServer`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
