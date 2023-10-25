@@ -16,7 +16,7 @@ export default async function sendEmail(shop, content, hasAttachment) {
         const subject = (hasAttachment) ? "Discounts for " + shop : "Commissions owed by " + shop;
         const text = (hasAttachment) ? "Shop: " + shop + "\n\n(Automatic Discount Generator)" 
             : "Shop: " + shop + "\nCommissions Owed: $" + content + "\n\n(Automatic Commission Tracker)";
-            
+
         const mailOptions = (hasAttachment) ? {
         from: "mglum@adelfi.shop",
         to: "mglum@adelfi.shop",

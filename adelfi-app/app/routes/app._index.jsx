@@ -20,7 +20,6 @@ import {
 
 import { getPartnership } from "~/models/partnership.server";
 import db from "../db.server";
-import sendEmail from "./sendEmail";
 
 import { authenticate } from "../shopify.server";
 
@@ -65,7 +64,7 @@ export async function action({ request }) {
   console.log("We're here...")
   const codesTextFile = arrayToTextFile(codesArray)
   const codesTextFileBuffer = Buffer.from(await codesTextFile.text())
-  console.log("Email response: " + JSON.stringify(await sendEmail(shop.split(".")[0], codesTextFileBuffer, true)))
+  console.log("Email response: " + JSON.stringify(await sendEmailToServer(shop.split(".")[0], codesTextFileBuffer, true)))
 
   partnership.codes = Buffer.from(JSON.stringify(codesArray), "utf-8")
 
@@ -790,6 +789,33 @@ async function deleteExistingWebhook(admin, id) {
 //     return json({ error: "Email sending failed", details: error });
 //   }
 // }
+
+async function sendEmailToServer(shop, content, hasAttachment) {
+  const data = {
+    shop: shop,
+    content: content,
+    hasAttachment: hasAttachment,
+  };
+
+  try {
+    const response = await fetch('/emailServer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Email sent:', result);
+    } else {
+      console.error('Email sending failed:', response.statusText);
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+};
 
 async function queryCurrentBulkOperation(admin) {
   const response = await admin.graphql(
