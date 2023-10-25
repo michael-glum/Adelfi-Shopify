@@ -7,7 +7,7 @@ export const action = async ({ request }) => {
     const { shop, content, hasAttachment } = await request.json();
 
     // Call email sending function
-    const emailResult = await sendEmail(shop, JSON.parse(content), hasAttachment);
+    const emailResult = await sendEmail(shop, content, hasAttachment);
 
     // Return a JSON response to the client
     return json(emailResult);
