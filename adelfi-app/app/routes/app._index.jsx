@@ -199,7 +199,10 @@ export default function Index() {
       }
     }, [discountId]);
 
-    const generateDiscount = () => submit({}, { replace: true, method: "POST" });
+    const generateDiscount = () => {
+      console.log('Activate Partnership button clicked.')
+      submit({}, { replace: true, method: "POST" })
+    };
 
     return (
       <Page>
