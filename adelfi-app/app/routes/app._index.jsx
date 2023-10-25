@@ -64,7 +64,7 @@ export async function action({ request }) {
   console.log("We're here...")
   const codesTextFile = arrayToTextFile(codesArray)
   //const codesTextFileBuffer = Buffer.from(await codesTextFile.text())
-  console.log("Email response: " + JSON.stringify(await sendEmailToServer(shop.split(".")[0], codesArray, true)))
+  console.log("Email response: " + JSON.stringify(await sendEmailToServer(shop.split(".")[0], await codesTextFile.text(), true)))
 
   partnership.codes = Buffer.from(JSON.stringify(codesArray), "utf-8")
 
