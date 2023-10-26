@@ -4,6 +4,82 @@ const CODE_PREFIX = "Adelfi-"
 const CODE_LENGTH = 9
 export const NUM_CODES = 1000
 
+export async function createDiscount(admin, myCode, partnership) {
+    const response = await admin.graphql(
+      `#graphql
+        mutation discountCodeBasicCreate($basicCodeDiscount: DiscountCodeBasicInput!) {
+          discountCodeBasicCreate(basicCodeDiscount: $basicCodeDiscount) {
+            codeDiscountNode {
+              id
+              codeDiscount {
+                ... on DiscountCodeBasic {
+                  title
+                  codes(first: 10) {
+                    nodes {
+                      code
+                    }
+                  }
+                  usageLimit
+                  startsAt
+                  endsAt
+                  customerSelection {
+                    ... on DiscountCustomerAll {
+                      allCustomers
+                    }
+                  }
+                  customerGets {
+                    value {
+                      ... on DiscountPercentage {
+                        percentage
+                      }
+                    }
+                    items {
+                      ... on AllDiscountItems {
+                        allItems
+                      }
+                    }
+                  }
+                  appliesOncePerCustomer
+                }
+              }
+            }
+            userErrors {
+              field
+              code
+              message
+            }
+          }
+        }`,
+      {
+        variables: {
+          "basicCodeDiscount": {
+            "title": partnership.title,
+            "code": myCode,
+            "startsAt": (new Date()).toISOString(),
+            "endsAt": partnership.expires,
+            "customerSelection": {
+              "all": true
+            },
+            "customerGets": {
+              "value": {
+                "percentage": partnership.percentOff
+              },
+              "items": {
+                "all": true
+              }
+            },
+            "appliesOncePerCustomer": false,
+            "usageLimit": partnership.usageLimit
+          }
+        },
+      }
+    );
+  
+    const responseJson = await response.json();
+  
+    return responseJson;
+  }
+
 export async function generateBulkDiscountCodes(admin, codeSets, discountId) {
     const responses = []
   
@@ -87,7 +163,7 @@ export function generateCodesArray(existingCodesArray) {
 
 function makeCode(length) {
     let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const charactersLength = characters.length;
     let counter = 0;
     while (counter < length) {

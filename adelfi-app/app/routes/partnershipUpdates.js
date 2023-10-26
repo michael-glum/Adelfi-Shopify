@@ -4,6 +4,7 @@ import { unauthenticated } from "../shopify.server";
 //import nodemailer from "nodemailer";
 import sendEmail from "./sendEmail.server";
 import {
+  createDiscount,
   generateBulkDiscountCodes,
   generateCodesArray,
   generateCodes,
@@ -11,7 +12,7 @@ import {
 } from "./bulkDiscountCodes";
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
-const EMAIL_PASS = process.env.EMAIL_PASS;
+//const EMAIL_PASS = process.env.EMAIL_PASS;
 const ORDER_GRACE_PERIOD = 6;
 const UPDATE_SALES_TASK = "UPDATE_SALES"
 const COLLECT_COMMISSIONS_TASK = "COLLECT_COMMISSIONS"
@@ -85,7 +86,6 @@ export const action = async ({ request }) => {
     }
     return json({ message: "API endpoint reached"});
 };
-
 
 async function queryOrdersBulkOperation(admin) {
     const queryDate = await getDateXDaysAgo(ORDER_GRACE_PERIOD);
@@ -198,11 +198,30 @@ async function collectCommissions(partnership, admin) {
       // Assign the updated data back to partnership.codes
       partnership.codes = updatedCodesBuffer;
 
-      // Partition sets of codes
-      const codeSets = generateCodes(codesArray);
+      // Get the first code to make the initial discount with
+      const firstCode = codesArray.pop()
 
-      // Generate discount codes using graphql api
-      generateBulkDiscountCodes(admin, codeSets, partnership.discountId);
+      // Partition sets of codes
+      const codeSets = generateCodes(codesArray)
+
+      // Set new expiration date for two months from now
+      const expiresDate = new Date(partnership.expires);
+
+      expiresDate.setMonth(expiresDate.getMonth() + 2);
+
+      partnership.expires = expiresDate;
+
+      // Generate original discount
+      const discountJson = await createDiscount(admin, firstCode.code, partnership);
+
+      // Get new discountId
+      const discountId = await discountJson.data.discountCodeBasicCreate.codeDiscountNode.id
+
+      // Store new discountId
+      partnership.discountId = discountId
+
+      // Generate bulk discounts codes for the new discount identified by discountId
+      generateBulkDiscountCodes(admin, codeSets, discountId);
     } else {
       partnership.isActive = false;
       const response = deleteBulkDiscountCodes(admin, partnership.discountId)

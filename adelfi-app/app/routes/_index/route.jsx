@@ -23,8 +23,7 @@ export default function App() {
   return (
     <div className="index">
       <div className="content">
-        <h1>A short heading about [your app]</h1>
-        <p>A tagline about [your app] that describes your value proposition.</p>
+        <h1>Manage your partnership with Adelfi in just one click!</h1>
         {showForm && (
           <Form method="post" action="/auth/login">
             <label>
@@ -35,20 +34,6 @@ export default function App() {
             <button type="submit">Log in</button>
           </Form>
         )}
-        <ul>
-          <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
-          </li>
-          <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
-          </li>
-          <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
-          </li>
-        </ul>
       </div>
     </div>
   );

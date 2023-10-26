@@ -3,7 +3,7 @@ import db from "../db.server";
 export async function getPartnership(shop, graphql) {
     const partnership = await db.partnership.findFirst({ where: { shop: shop } });
 
-    if (!partnership) {
+    if (!partnership || !partnership.isActive) {
         return null
     }
 

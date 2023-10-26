@@ -19,6 +19,7 @@ import {
 } from "@shopify/polaris";
 
 import {
+  createDiscount,
   generateBulkDiscountCodes,
   generateCodesArray,
   generateCodes,
@@ -30,8 +31,6 @@ import db from "../db.server";
 
 import { authenticate } from "../shopify.server";
 
-const endDate = "2023-11-28T12:00:00Z";
-const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
 const BASE_URL = "https://adelfi.fly.dev/";
 
 export const loader = async ({ request }) => {
@@ -83,7 +82,7 @@ export async function action({ request }) {
 
   const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
-  partnership.expires = new Date(endDate)
+  //partnership.expires = new Date(endDate)
   partnership.autoRenew = true
 
   const updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
@@ -97,7 +96,7 @@ export async function action({ request }) {
   });
 }
 
-function DiscountDetailsTable({ title, percentOff, usageLimit, commission }) {
+function DiscountDetailsTable({ title, percentOff, usageLimit, commission, endDateFormatted }) {
   const rows = [
     [title, NUM_CODES, Math.floor(percentOff * 100) + "%", usageLimit, commission, endDateFormatted],
   ];
@@ -136,12 +135,13 @@ export default function Index() {
   const loaderData = useLoaderData();
   const partnership = loaderData?.partnership
   console.log("Partnership: " + (partnership != null));
-  if (partnership != null) {
+  if (partnership != null && partnership.isActive === true) {
   
     const title = partnership?.title
     const percentOff = partnership?.percentOff
     const usageLimit = partnership?.usageLimit
     const commission = partnership?.commission
+    const expires = new Date(partnership?.expires).toDateString().substring(3);
 
     const isLoading =
       ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
@@ -188,7 +188,7 @@ export default function Index() {
                       <Text as="h3" variant="headingMd">
                         Partnership Details
                       </Text>
-                      <DiscountDetailsTable title={title} percentOff={percentOff} usageLimit={usageLimit} commission={commission}/>
+                      <DiscountDetailsTable title={title} percentOff={percentOff} usageLimit={usageLimit} commission={commission} endDateFormatted={expires}/>
                       <Text as="p" variant="bodyMd" alignment="center">
                         All codes are generated automatically and sent to our marketing team at Adelfi for distribution.
                       </Text>
@@ -474,82 +474,6 @@ export default function Index() {
     );
   }
 };
-
-async function createDiscount(admin, myCode, partnership) {
-  const response = await admin.graphql(
-    `#graphql
-      mutation discountCodeBasicCreate($basicCodeDiscount: DiscountCodeBasicInput!) {
-        discountCodeBasicCreate(basicCodeDiscount: $basicCodeDiscount) {
-          codeDiscountNode {
-            id
-            codeDiscount {
-              ... on DiscountCodeBasic {
-                title
-                codes(first: 10) {
-                  nodes {
-                    code
-                  }
-                }
-                usageLimit
-                startsAt
-                endsAt
-                customerSelection {
-                  ... on DiscountCustomerAll {
-                    allCustomers
-                  }
-                }
-                customerGets {
-                  value {
-                    ... on DiscountPercentage {
-                      percentage
-                    }
-                  }
-                  items {
-                    ... on AllDiscountItems {
-                      allItems
-                    }
-                  }
-                }
-                appliesOncePerCustomer
-              }
-            }
-          }
-          userErrors {
-            field
-            code
-            message
-          }
-        }
-      }`,
-    {
-      variables: {
-        "basicCodeDiscount": {
-          "title": partnership.title,
-          "code": myCode,
-          "startsAt": (new Date()).toISOString(),
-          "endsAt": endDate,
-          "customerSelection": {
-            "all": true
-          },
-          "customerGets": {
-            "value": {
-              "percentage": partnership.percentOff
-            },
-            "items": {
-              "all": true
-            }
-          },
-          "appliesOncePerCustomer": false,
-          "usageLimit": partnership.usageLimit
-        }
-      },
-    }
-  );
-
-  const responseJson = await response.json();
-
-  return responseJson;
-}
 
 async function subscribeToBulkOperationsWebhook(admin) {
   const existingWebhook = await isExistingWebhook(admin);
