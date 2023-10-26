@@ -56,7 +56,7 @@ export async function createDiscount(admin, myCode, partnership) {
             "title": partnership.title,
             "code": myCode,
             "startsAt": (new Date()).toISOString(),
-            "endsAt": partnership.expires,
+            "endsAt": new Date(partnership.expires),
             "customerSelection": {
               "all": true
             },

@@ -221,7 +221,7 @@ async function collectCommissions(partnership, admin) {
 
       // Store new discountId
       partnership.discountId = discountId
-
+      console.log("New codes generating for expiration date: " + partnership.expires);
       // Generate bulk discounts codes for the new discount identified by discountId
       generateBulkDiscountCodes(admin, codeSets, discountId);
     } else {
