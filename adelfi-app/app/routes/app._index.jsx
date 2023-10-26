@@ -82,7 +82,7 @@ export async function action({ request }) {
 
   const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
-  //partnership.expires = new Date(endDate)
+  partnership.expires = new Date()
   partnership.autoRenew = true
 
   const updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
