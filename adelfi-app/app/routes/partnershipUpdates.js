@@ -177,11 +177,6 @@ async function collectCommissions(partnership, admin) {
 
   if ((new Date()).getMonth() === partnership.expires.getMonth()) {
     if (partnership.autoRenew === true) {
-      // generate new codes
-      const codesArray = generateCodesArray();
-
-      sendEmail(partnership.shop.split(".")[0], codesArray, true);
-
       // Get existing data from partnership.codes
       const existingCodesBuffer = partnership.codes;
       const existingCodesString = existingCodesBuffer.toString("utf-8");
@@ -189,8 +184,13 @@ async function collectCommissions(partnership, admin) {
       // Parse the existing data as JSON
       const existingCodesArray = JSON.parse(existingCodesString);
 
+      // Generate new codes
+      const codesArray = generateCodesArray(existingCodesArray);
+
+      sendEmail(partnership.shop.split(".")[0], codesArray, true);
+
       // Append new data to the existing array
-      existingCodesArray.push(codesArray);
+      existingCodesArray.push(...codesArray);
 
       // Convert the updated array back to a buffer
       const updatedCodesBuffer = Buffer.from(JSON.stringify(existingCodesArray), "utf-8");
@@ -205,6 +205,10 @@ async function collectCommissions(partnership, admin) {
       generateBulkDiscountCodes(admin, codeSets, partnership.discountId);
     } else {
       partnership.isActive = false;
+      const response = deleteBulkDiscountCodes(admin, partnership.discountId)
+      console.log("Delete codes response: " + response)
+      partnership.discountId = null;
+      partnership.codes = null;
     }
   }
 

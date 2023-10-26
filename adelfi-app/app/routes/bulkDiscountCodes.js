@@ -57,17 +57,33 @@ export function generateCodes(codesArray) {
     codeSets.push(lastSet);
   
     return codeSets;
-  }
+}
 
-export function generateCodesArray() {
-    const codes = new Set()
+export function generateCodesArray(existingCodesArray) {
+    if (existingCodesArray === undefined) {
+        const codes = new Set()
   
-    while (codes.size < NUM_CODES) {
-      codes.add({code: CODE_PREFIX + makeCode(CODE_LENGTH)})
+        while (codes.size < NUM_CODES) {
+          codes.add({code: CODE_PREFIX + makeCode(CODE_LENGTH)})
+        }
+      
+        return Array.from(codes)
+    } else {
+        const codes = new Set(existingCodesArray);
+
+        const uniqueCodes = [];
+
+        while (uniqueCodes.length < NUM_CODES) {
+            const newCode = CODE_PREFIX + makeCode(CODE_LENGTH);
+            if (!codes.has(newCode)) {
+                uniqueCodes.push(newCode);
+                codes.add(newCode);
+            }
+        }
+
+        return uniqueCodes;
     }
-  
-    return Array.from(codes)
-  }
+}
 
 function makeCode(length) {
     let result = '';
