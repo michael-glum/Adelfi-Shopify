@@ -18,15 +18,20 @@ import {
   Badge,
 } from "@shopify/polaris";
 
+import {
+  generateBulkDiscountCodes,
+  generateCodesArray,
+  generateCodes,
+  NUM_CODES,
+} from "./bulkDiscountCodes";
+
 import { getPartnership } from "~/models/partnership.server";
 import db from "../db.server";
 
 import { authenticate } from "../shopify.server";
 
-const numDiscounts = 1000;
 const endDate = "2023-11-28T12:00:00Z";
 const endDateFormatted = (new Date(endDate)).toDateString().substring(3);
-const codePrefix = "Adelfi-"
 const BASE_URL = "https://adelfi.fly.dev/";
 
 export const loader = async ({ request }) => {
@@ -44,7 +49,7 @@ export async function action({ request }) {
   const { shop } = session;
   const partnership = await db.partnership.findFirst({ where: { shop: shop }})
 
-  if (partnership == null || partnership.codes != null) {
+  if (partnership == null || partnership.codes != null || partnership.isActive == false) {
     return null
   }
 
@@ -58,13 +63,10 @@ export async function action({ request }) {
     }
   }
 
-  const codeLength = 9
+  const codesArray = generateCodesArray()
 
-  const codesArray = generateCodesArray(numDiscounts, codeLength)
-  console.log("We're here...")
-  //const codesTextFile = arrayToTextFile(codesArray)
-  //const codesTextFileBuffer = Buffer.from(await codesTextFile.text())
   const emailResponse = await sendEmailToServer(shop.split(".")[0], codesArray, true);
+
   console.log("Email response: " + JSON.stringify(emailResponse))
 
   partnership.codes = Buffer.from(JSON.stringify(codesArray), "utf-8")
@@ -81,7 +83,6 @@ export async function action({ request }) {
 
   const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
-  partnership.isActive = true
   partnership.expires = new Date(endDate)
   partnership.autoRenew = true
 
@@ -96,50 +97,9 @@ export async function action({ request }) {
   });
 }
 
-function generateCodesArray(numberOfCodes, codeLength) {
-  const codes = new Set()
-
-  while (codes.size < numberOfCodes) {
-    codes.add({code: codePrefix + makeCode(codeLength)})
-  }
-
-  return Array.from(codes)
-}
-
-function generateCodes(codesArray) {
-
-  const setCount = Math.ceil(codesArray.length / 100)
-  const codeSets = [];
-
-  for (let i = 0; i < setCount - 1; i++) {
-    const startIndex = i * 100;
-    const endIndex = (i + 1) * 100;
-    const codeSet = codesArray.slice(startIndex, endIndex)
-    codeSets.push(codeSet)
-  }
-
-  const lastIndex = setCount - 1;
-  const lastSet = codesArray.slice(lastIndex * 100);
-  codeSets.push(lastSet);
-
-  return codeSets;
-}
-
-function makeCode(length) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
-  }
-  return result;
-}
-
 function DiscountDetailsTable({ title, percentOff, usageLimit, commission }) {
   const rows = [
-    [title, numDiscounts, Math.floor(percentOff * 100) + "%", usageLimit, commission, endDateFormatted],
+    [title, NUM_CODES, Math.floor(percentOff * 100) + "%", usageLimit, commission, endDateFormatted],
   ];
 
   return (
@@ -282,7 +242,7 @@ export default function Index() {
                           >
                             <VerticalStack gap="2">
                               <Text as="h1" variant="headingMd" alignment="center">
-                                All Time Earnings
+                                All Time Revenue
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
                                 ${partnership.totalSales.toFixed(2)} USD
@@ -320,7 +280,7 @@ export default function Index() {
                         If you wish to discontinue your partnership, contact Adelfi before the start of the next period. Your service will be terminated once the current period has expired.
                       </Text>
                       <Text as="p" variant="bodyMd">
-                        Upon recieving a commission invoice at the end of a period, the amount must be payed in full before the end of the next period or your service will be terminated.
+                        Commission invoices will be sent at the beginning of each month. The amount must be payed in full before the end of the month or your service will be terminated.
                       </Text>
                     </VerticalStack>
                   </VerticalStack>
@@ -423,23 +383,7 @@ export default function Index() {
                   <VerticalStack gap="5">
                     <VerticalStack gap="2">
                       <Text as="h2" variant="headingMd">
-                        Consider partnering with Adelfi
-                      </Text>
-                    </VerticalStack>
-                    <VerticalStack gap="2">
-                      <Text as="h3" variant="headingMd">
-                        Partnership Details
-                      </Text>
-                      <Text as="p" variant="bodyMd">
-                        _____
-                      </Text>
-                    </VerticalStack>
-                    <VerticalStack gap="2">
-                      <Text as="h3" variant="headingMd">
-                        Terms
-                      </Text>
-                      <Text as="p" variant="bodyMd">
-                        _____
+                        Consider a partnership with Adelfi!
                       </Text>
                     </VerticalStack>
                   </VerticalStack>
@@ -607,49 +551,6 @@ async function createDiscount(admin, myCode, partnership) {
   return responseJson;
 }
 
-async function generateBulkDiscountCodes(admin, codeSets, discountId) {
-  const responses = []
-
-  while (responses.length < codeSets.length) {
-    const codes = codeSets[responses.length]
-
-    const response = await admin.graphql(
-      `#graphql
-        mutation discountRedeemCodeBulkAdd($discountId: ID!, $codes: [DiscountRedeemCodeInput!]!) {
-          discountRedeemCodeBulkAdd(discountId: $discountId, codes: $codes) {
-            bulkCreation {
-              id
-            }
-            userErrors {
-              code
-              field
-              message
-            }
-          }
-        }`,
-      {
-        variables: {
-          "discountId": discountId,
-          "codes": codes
-        },
-      }
-    ); 
-    const responseJson = await response.json()
-    if (responseJson.data.discountRedeemCodeBulkAdd.bulkCreation != null) {
-      responses.push(responseJson)
-    }
-  }
-
-  return responses
-}
-
-function arrayToTextFile(data) {
-  const textContent = data.join(',');
-  const blob = new Blob([textContent], { type: 'text/plain'});
-
-  return blob;
-}
-
 async function subscribeToBulkOperationsWebhook(admin) {
   const existingWebhook = await isExistingWebhook(admin);
   if (existingWebhook != null) {
@@ -758,38 +659,6 @@ async function deleteExistingWebhook(admin, id) {
   console.log("DELETED webhook subscription: " + deletedSubscriptionId)
   return deletedSubscriptionId;
 }
-
-// async function sendEmail(shop, codesTextFileBuffer) {
-//   try {
-//     const transporter = nodemailer.createTransport({
-//       service: "Gmail",
-//       auth: {
-//         user: "mglum@adelfi.shop",
-//         pass: EMAIL_PASS,
-//       },
-//     });
-
-//     const mailOptions = {
-//       from: "mglum@adelfi.shop",
-//       to: "mglum@adelfi.shop",
-//       subject: "Discounts for " + shop,
-//       text: "Shop: " + shop + "\n\n(Automatic Discount Generator)",
-//       attachments: [
-//         {
-//           filename: shop + "_codes.txt",
-//           content: codesTextFileBuffer,
-//         }
-//       ]
-//     };
-
-//     const info = await transporter.sendMail(mailOptions);
-
-//     return json({ message: "Email sent successfully", info });
-//   } catch (error) {
-//     console.error("Email sending failed", error);
-//     return json({ error: "Email sending failed", details: error });
-//   }
-// }
 
 async function sendEmailToServer(shop, content, hasAttachment) {
   const data = {

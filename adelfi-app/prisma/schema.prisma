@@ -26,11 +26,11 @@ model Partnership {
   shop        String
   discountId  String?
   title       String
-  isActive    Boolean   @default(false)
+  isActive    Boolean   @default(true)
   usageLimit  Int
   percentOff  Float
-  expires     DateTime?
-  autoRenew   Boolean   @default(false)
+  expires     DateTime
+  autoRenew   Boolean   @default(true)
   commission  Float
   codes       Bytes?
   totalSales  Float     @default(0)

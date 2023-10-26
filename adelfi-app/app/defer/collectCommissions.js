@@ -10,7 +10,7 @@ async function collectCommissions() {
         task: COLLECT_COMMISSIONS_TASK
     }
     console.log(requestBody.token);
-    const response = await fetch(`${API_BASE_URL}partnership`, {
+    const response = await fetch(`${API_BASE_URL}partnershipUpdates`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

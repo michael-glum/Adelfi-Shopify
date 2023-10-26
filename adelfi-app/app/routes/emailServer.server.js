@@ -1,5 +1,5 @@
 import { json } from "@remix-run/node";
-import sendEmail from './sendEmail';
+import sendEmail from './sendEmail.server';
 
 export const action = async ({ request }) => {
   if (request.method === 'POST') {
