@@ -2,7 +2,7 @@
 
 const CODE_PREFIX = "Adelfi-"
 const CODE_LENGTH = 9
-export const NUM_CODES = 1000
+export const NUM_CODES = 4000
 
 export async function createDiscount(admin, myCode, partnership) {
     const response = await admin.graphql(
