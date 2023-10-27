@@ -15,7 +15,7 @@ const { startOfMonth } = require('date-fns');
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 //const EMAIL_PASS = process.env.EMAIL_PASS;
-const ORDER_GRACE_PERIOD = 9;
+const ORDER_GRACE_PERIOD = 1;
 const UPDATE_SALES_TASK = "UPDATE_SALES"
 const COLLECT_COMMISSIONS_TASK = "COLLECT_COMMISSIONS"
 
