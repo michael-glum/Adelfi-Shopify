@@ -31,7 +31,7 @@ import db from "../db.server";
 
 import { authenticate } from "../shopify.server";
 
-import { addMonths, startOfMonth } from "date-fns";
+import { addMonths, startOfMonth, addMinutes } from "date-fns";
 
 const BASE_URL = "https://adelfi.fly.dev/";
 
@@ -145,7 +145,7 @@ export default function Index() {
     const percentOff = partnership?.percentOff
     const usageLimit = partnership?.usageLimit
     const commission = partnership?.commission
-    const expires = partnership?.expires.toDateString().substring(3);
+    const expires = addMinutes(new Date(partnership?.expires), 1).toDateString().substring(3);
 
     const isLoading =
       ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
