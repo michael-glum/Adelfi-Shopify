@@ -9,7 +9,7 @@ import {
   generateCodesArray,
   generateCodes,
   deleteBulkDiscountCodes,
-} from "./bulkDiscountCodes";
+} from "./discountUtility";
 
 const { startOfMonth } = require('date-fns');
 

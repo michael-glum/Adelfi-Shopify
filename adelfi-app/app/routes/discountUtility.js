@@ -69,7 +69,10 @@ export async function createDiscount(admin, myCode, partnership) {
               }
             },
             "appliesOncePerCustomer": false,
-            "usageLimit": partnership.usageLimit
+            "usageLimit": partnership.usageLimit,
+            "combinesWith": {
+              "shippingDiscounts": true
+            }
           }
         },
       }

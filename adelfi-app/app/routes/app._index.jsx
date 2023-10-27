@@ -24,19 +24,23 @@ import {
   generateCodesArray,
   generateCodes,
   NUM_CODES,
-} from "./bulkDiscountCodes";
+} from "./discountUtility";
 
 import { getPartnership } from "~/models/partnership.server";
 import db from "../db.server";
 
-import { authenticate } from "../shopify.server";
-
-import { addHours } from "date-fns";
+import { ONE_TIME_PURCHASE, authenticate } from "../shopify.server";
 
 const BASE_URL = "https://adelfi.fly.dev/";
 
 export const loader = async ({ request }) => {
-  const { admin, session } = await authenticate.admin(request);
+  const { billing, admin, session } = await authenticate.admin(request);
+  await billing.require({
+    plans: [ONE_TIME_PURCHASE],
+    isTest: true,
+    onFailure: async () => billing.request({ plan: ONE_TIME_PURCHASE }),
+  });
+
   const partnership = await getPartnership(session.shop, admin.graphql)
 
   return json({
@@ -141,7 +145,7 @@ export default function Index() {
     const percentOff = partnership?.percentOff
     const usageLimit = partnership?.usageLimit
     const commission = partnership?.commission
-    const expires = addHours(new Date(partnership?.expires), 12).toDateString().substring(3);
+    const expires = (new Date(partnership?.expires)).toDateString().substring(3);
 
     const isLoading =
       ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
@@ -242,7 +246,7 @@ export default function Index() {
                           >
                             <VerticalStack gap="2">
                               <Text as="h1" variant="headingMd" alignment="center">
-                                All Time Revenue
+                                Net Sales (All Time)
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
                                 ${partnership.totalSales.toFixed(2)} USD
@@ -259,7 +263,7 @@ export default function Index() {
                           >
                             <VerticalStack gap="2">
                               <Text as="h1" variant="headingMd" alignment="center">
-                                Current Commissions
+                                Commission (Monthly)
                               </Text>
                               <Text as="h1" variant="headingMd" alignment="center">
                                 ${(Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2)} USD

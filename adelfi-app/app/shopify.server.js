@@ -4,11 +4,14 @@ import {
   DeliveryMethod,
   shopifyApp,
   LATEST_API_VERSION,
+  BillingInterval,
 } from "@shopify/shopify-app-remix/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import { restResources } from "@shopify/shopify-api/rest/admin/2023-07";
 
 import prisma from "./db.server";
+
+export const ONE_TIME_PURCHASE = "One time purchase";
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
@@ -21,6 +24,13 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
   restResources,
+  billing: {
+    [ONE_TIME_PURCHASE]: {
+      amount: 5,
+      currencyCode: "USD",
+      interval: BillingInterval.OneTime
+    }
+  },
   webhooks: {
     APP_UNINSTALLED: {
       deliveryMethod: DeliveryMethod.Http,
