@@ -3,6 +3,7 @@ import { json } from "@remix-run/node"
 import { Readable } from 'stream'
 import { createInterface } from 'readline'
 import db from '../db.server'
+import { sendDailyEmail } from "./sendEmail.server";
 
 export async function action ({ request }) {
     try {
@@ -87,6 +88,8 @@ export async function action ({ request }) {
                     return json({ success: true }, { status: 200 });
                 }
                 partnership.lastUpdated = today;
+                const emailResponse = await sendDailyEmail(shop.split(".")[0], newSales, false)
+                console.log("Email response for newSales:", JSON.stringify(emailResponse));
                 const updateResponse = await db.partnership.updateMany({ where: { shop: shop}, data: { ...partnership }})
                 if (updateResponse.count === 0) {
                     console.error("Error: Couldn't update partnership in db for shop: " + shop);
