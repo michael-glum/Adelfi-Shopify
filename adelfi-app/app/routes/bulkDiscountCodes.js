@@ -76,7 +76,7 @@ export async function createDiscount(admin, myCode, partnership) {
     );
   
     const responseJson = await response.json();
-  
+    console.log("Result: " + JSON.stringify(responseJson));
     return responseJson;
   }
 
