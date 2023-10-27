@@ -177,7 +177,7 @@ async function collectCommissions(partnership, admin) {
   const emailResponse = await sendEmail(partnership.shop.split(".")[0], currSales, false)
   console.log("Email response:", JSON.stringify(emailResponse));
 
-  if ((new Date()).getMonth() === partnership.expires.getMonth()) {
+  if (true) {//((new Date()).getMonth() === partnership.expires.getMonth()) {
     if (partnership.autoRenew === true) {
       // Get existing data from partnership.codes
       const existingCodesBuffer = partnership.codes;
