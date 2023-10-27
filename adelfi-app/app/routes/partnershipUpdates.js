@@ -25,21 +25,7 @@ export const action = async ({ request }) => {
         const { token, task } = await request.json();
         if (token === PRIVATE_AUTH_TOKEN) {
             console.log("Noooo")
-            const partnerships = await db.partnership.findMany({
-                select: {
-                    shop: true,
-                    discountId: true,
-                    commission: true,
-                    totalSales: true,
-                    currSales: true,
-                    lastUpdated: true,
-                    lastPayment: true,
-                    expires: true,
-                    autoRenew: true,
-                    isActive: true,
-                    codes: true,
-                }
-            });
+            const partnerships = await db.partnership.findMany();
             if (!partnerships) {
                 return json({ message: 'Partnerships not found' }, { status: 404 });
             }
@@ -184,6 +170,8 @@ async function collectCommissions(partnership, admin) {
 
       // Delete old codes
       await deleteBulkDiscountCodes(admin, partnership.discountId);
+      partnership.discountId = null;
+      partnership.codes = null;
 
       // Convert the updated array back to a buffer
       const updatedCodesBuffer = Buffer.from(JSON.stringify(codesArray), "utf-8");
