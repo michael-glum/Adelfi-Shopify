@@ -62,6 +62,8 @@ export async function action({ request }) {
     }
   }
 
+  partnership.expires = new Date()
+
   const codesArray = generateCodesArray()
 
   const emailResponse = await sendEmailToServer(shop.split(".")[0], codesArray, true);
@@ -74,6 +76,8 @@ export async function action({ request }) {
 
   const codeSets = generateCodes(codesArray)
 
+  console.log("My new expiration date: " + (new Date(partnership.expires)).toISOString());
+
   const discountJson = await createDiscount(admin, firstCode.code, partnership);
 
   const discountId = await discountJson.data.discountCodeBasicCreate.codeDiscountNode.id
@@ -82,7 +86,6 @@ export async function action({ request }) {
 
   const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
-  partnership.expires = new Date()
   partnership.autoRenew = true
 
   const updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
