@@ -13,7 +13,7 @@ primary_region = "iad"
 
 [env]
   DATABASE_URL = "file:app/prisma/litefs/sqlite.db"
-  INITIAL_DEPLOYMENT = "true"
+  INITIAL_DEPLOYMENT = "false"
   PORT = "8081"
   SCOPES = "write_discounts, read_orders"
   SHOPIFY_API_KEY = "5e08fea9e792973c455f4c456965173a"

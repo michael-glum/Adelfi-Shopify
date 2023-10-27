@@ -230,7 +230,7 @@ export default function Index() {
                         </pre>
                       </Box>
                     )}
-                    {partnership.totalSales > 0 ? (
+                    {partnership.discountId != null ? (
                       <VerticalStack gap="2">
                         <Text as="h3" variant="headingMd">
                           Usage
