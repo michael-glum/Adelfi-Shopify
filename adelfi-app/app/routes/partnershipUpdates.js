@@ -179,27 +179,21 @@ async function collectCommissions(partnership, admin) {
 
   if (true) {//((new Date()).getMonth() === partnership.expires.getMonth()) {
     if (partnership.autoRenew === true) {
-      // Get existing data from partnership.codes
-      const existingCodesBuffer = partnership.codes;
-      const existingCodesString = existingCodesBuffer.toString("utf-8");
-      
-      // Parse the existing data as JSON
-      const existingCodesArray = JSON.parse(existingCodesString);
-
       // Generate new codes
-      const codesArray = generateCodesArray(existingCodesArray);
+      const codesArray = generateCodesArray();
 
-      // Append new data to the existing array
-      existingCodesArray.push(...codesArray);
+      // Delete old codes
+      await deleteBulkDiscountCodes(admin, partnership.discountId);
 
       // Convert the updated array back to a buffer
-      const updatedCodesBuffer = Buffer.from(JSON.stringify(existingCodesArray), "utf-8");
+      const updatedCodesBuffer = Buffer.from(JSON.stringify(codesArray), "utf-8");
 
       // Assign the updated data back to partnership.codes
       partnership.codes = updatedCodesBuffer;
 
       // Get the first code to make the initial discount with
       const firstCode = codesArray.pop()
+      console.log("First code " + firstCode);
 
       // Partition sets of codes
       const codeSets = generateCodes(codesArray)
@@ -220,6 +214,7 @@ async function collectCommissions(partnership, admin) {
       // Store new discountId
       partnership.discountId = discountId
       console.log("New codes generating for expiration date: " + partnership.expires);
+
       // Generate bulk discounts codes for the new discount identified by discountId
       generateBulkDiscountCodes(admin, codeSets, discountId);
 
