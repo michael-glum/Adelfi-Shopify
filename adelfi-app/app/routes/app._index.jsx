@@ -45,7 +45,6 @@ export const loader = async ({ request }) => {
 };
 
 export async function action({ request }) {
-  console.log("Action");
   const { admin, session } = await authenticate.admin(request);
   const { shop } = session;
   const partnership = await db.partnership.findFirst({ where: { shop: shop }})
@@ -68,9 +67,7 @@ export async function action({ request }) {
 
   const codesArray = generateCodesArray()
 
-  const emailResponse = await sendEmailToServer(shop.split(".")[0], codesArray, true);
-
-  console.log("Email response: " + JSON.stringify(emailResponse))
+  const emailCodesArray = [...codesArray];
 
   partnership.codes = Buffer.from(JSON.stringify(codesArray), "utf-8")
 
@@ -88,9 +85,11 @@ export async function action({ request }) {
 
   const responses = generateBulkDiscountCodes(admin, codeSets, discountId);
 
-  partnership.autoRenew = true
-
   const updatePartnership = await db.partnership.updateMany({ where: { shop: shop }, data: { ...partnership }})
+
+  const emailResponse = await sendEmailToServer(shop.split(".")[0], emailCodesArray, true);
+
+  console.log("Email response: " + JSON.stringify(emailResponse))
 
   return json({
     discount: discountJson.data.discountCodeBasicCreate.codeDiscountNode,
@@ -146,7 +145,7 @@ export default function Index() {
     const percentOff = partnership?.percentOff
     const usageLimit = partnership?.usageLimit
     const commission = partnership?.commission
-    const expires = new Date(partnership?.expires).toDateString().substring(3);
+    const expires = partnership?.expires.toDateString().substring(3);
 
     const isLoading =
       ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
