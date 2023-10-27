@@ -31,6 +31,8 @@ import db from "../db.server";
 
 import { authenticate } from "../shopify.server";
 
+import { addMonths, startOfMonth } from "date-fns";
+
 const BASE_URL = "https://adelfi.fly.dev/";
 
 export const loader = async ({ request }) => {
@@ -62,7 +64,7 @@ export async function action({ request }) {
     }
   }
 
-  partnership.expires = new Date()
+  partnership.expires = startOfMonth(addMonths(new Date(), 1));
 
   const codesArray = generateCodesArray()
 
