@@ -21,4 +21,4 @@ async function updateSales() {
     return response
 }
 
-export default defer.cron(updateSales, "6 1 * * *");
+export default defer.cron(updateSales, "22 18 * * *");

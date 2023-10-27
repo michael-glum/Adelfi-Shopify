@@ -14,7 +14,7 @@ async function seedDatabase() {
         id: 'gid://shopify/Shop/83699237168',
         shop: 'quickstart-9f306b3f.myshopify.com',
         title: '25% Off With Adelfi',
-        usageLimit: 4,
+        usageLimit: 500,
         percentOff: 0.25,
         commission: 0.1,
         totalSales: 0,

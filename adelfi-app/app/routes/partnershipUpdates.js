@@ -179,6 +179,9 @@ async function collectCommissions(partnership, admin) {
       // Assign the updated data back to partnership.codes
       partnership.codes = updatedCodesBuffer;
 
+      // Grab array to be emailed before popping the first code
+      const emailCodesArray = [...codesArray];
+
       // Get the first code to make the initial discount with
       const firstCode = codesArray.pop()
       console.log("First code " + firstCode);
@@ -206,7 +209,6 @@ async function collectCommissions(partnership, admin) {
       // Generate bulk discounts codes for the new discount identified by discountId
       generateBulkDiscountCodes(admin, codeSets, discountId);
 
-      const emailCodesArray = [...codesArray];
       sendEmail(partnership.shop.split(".")[0], emailCodesArray, true);
     } else {
       partnership.isActive = false;

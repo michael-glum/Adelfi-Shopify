@@ -21,4 +21,4 @@ async function collectCommissions() {
     return response
 }
 
-export default defer.cron(collectCommissions, "53 1 * * *");//"0 0 1 * *");
+export default defer.cron(collectCommissions, "25 18 * * *");//"0 0 1 * *");

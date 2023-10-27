@@ -5,8 +5,6 @@ const CODE_LENGTH = 9
 export const NUM_CODES = 1000
 
 export async function createDiscount(admin, myCode, partnership) {
-    console.log("Partnership: " + JSON.stringify(partnership));
-    console.log("myCode: " + JSON.stringify(myCode));
     const response = await admin.graphql(
       `#graphql
         mutation discountCodeBasicCreate($basicCodeDiscount: DiscountCodeBasicInput!) {
