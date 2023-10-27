@@ -189,8 +189,6 @@ async function collectCommissions(partnership, admin) {
       // Generate new codes
       const codesArray = generateCodesArray(existingCodesArray);
 
-      sendEmail(partnership.shop.split(".")[0], codesArray, true);
-
       // Append new data to the existing array
       existingCodesArray.push(...codesArray);
 
@@ -224,6 +222,9 @@ async function collectCommissions(partnership, admin) {
       console.log("New codes generating for expiration date: " + partnership.expires);
       // Generate bulk discounts codes for the new discount identified by discountId
       generateBulkDiscountCodes(admin, codeSets, discountId);
+
+      const emailCodesArray = [...codesArray];
+      sendEmail(partnership.shop.split(".")[0], emailCodesArray, true);
     } else {
       partnership.isActive = false;
       const response = deleteBulkDiscountCodes(admin, partnership.discountId)

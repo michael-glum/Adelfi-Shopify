@@ -31,7 +31,7 @@ import db from "../db.server";
 
 import { authenticate } from "../shopify.server";
 
-import { addMonths, startOfMonth, addMinutes } from "date-fns";
+import { addHours } from "date-fns";
 
 const BASE_URL = "https://adelfi.fly.dev/";
 
@@ -53,7 +53,6 @@ export async function action({ request }) {
     return null
   }
 
-  partnership.webhookId = null;
   // Set up bulk operations webhook subscription if it doesn't already exist
   if (partnership.webhookId == null) {
     const webhookId = await subscribeToBulkOperationsWebhook(admin);
@@ -64,8 +63,6 @@ export async function action({ request }) {
     }
   }
 
-  partnership.expires = startOfMonth(addMonths(new Date(), 1));
-
   const codesArray = generateCodesArray()
 
   const emailCodesArray = [...codesArray];
@@ -75,8 +72,6 @@ export async function action({ request }) {
   const firstCode = codesArray.pop()
 
   const codeSets = generateCodes(codesArray)
-
-  console.log("My new expiration date: " + (new Date(partnership.expires)).toISOString());
 
   const discountJson = await createDiscount(admin, firstCode.code, partnership);
 
@@ -146,7 +141,7 @@ export default function Index() {
     const percentOff = partnership?.percentOff
     const usageLimit = partnership?.usageLimit
     const commission = partnership?.commission
-    const expires = addMinutes(new Date(partnership?.expires), 1).toDateString().substring(3);
+    const expires = addHours(new Date(partnership?.expires), 12).toDateString().substring(3);
 
     const isLoading =
       ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";

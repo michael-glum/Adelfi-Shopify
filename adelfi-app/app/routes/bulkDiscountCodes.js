@@ -146,7 +146,7 @@ export function generateCodesArray(existingCodesArray) {
         return Array.from(codes)
     } else {
         const codes = new Set(existingCodesArray);
-
+        console.log(JSON.stringify(codes));
         const uniqueCodes = [];
 
         while (uniqueCodes.length < NUM_CODES) {
@@ -156,7 +156,7 @@ export function generateCodesArray(existingCodesArray) {
                 codes.add(newCode);
             }
         }
-
+        console.log("New codes: " + JSON.stringify(uniqueCodes))
         return uniqueCodes;
     }
 }
