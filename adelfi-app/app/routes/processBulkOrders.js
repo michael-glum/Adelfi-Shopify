@@ -35,7 +35,7 @@ export async function action ({ request }) {
 
         if (!partnership) {
             console.log("Partnership not found for shop: " + shop);
-            return json({ message: 'Partnership not found' }, { status: 404 });
+            return json({ message: 'Partnership not found' }, { status: 200 });
         }
 
         if (partnership.discountId == null || partnership.totalSales == null || partnership.currSales == null) {
@@ -109,7 +109,7 @@ export async function action ({ request }) {
     } catch (error) {
         console.error('Error processing the webhook:', error);
         // Handle the error and respond accordingly.
-        return json({ error: 'Webhook processing failed' }, { status: 400 });
+        return json({ error: 'Webhook processing failed' }, { status: 200 });
     }
 };
 
