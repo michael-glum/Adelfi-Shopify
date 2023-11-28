@@ -1,7 +1,7 @@
 // Utility functions for generating bulk discount codes
 
 const CODE_PREFIX = "Adelfi-"
-const CODE_LENGTH = 9
+const CODE_LENGTH = 6
 export const NUM_CODES = 4000
 
 export async function createDiscount(admin, myCode, partnership) {

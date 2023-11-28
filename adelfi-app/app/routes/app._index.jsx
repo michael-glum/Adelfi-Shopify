@@ -89,7 +89,7 @@ export async function action({ request }) {
 
   const emailResponse = await sendEmailToServer(shop.split(".")[0], emailCodesArray, true);
 
-  console.log("Email response: " + JSON.stringify(emailResponse))
+  //console.log("Email response: " + JSON.stringify(emailResponse))
 
   return json({
     discount: discountJson.data.discountCodeBasicCreate.codeDiscountNode,
@@ -138,7 +138,7 @@ export default function Index() {
   const submit = useSubmit();
   const loaderData = useLoaderData();
   const partnership = loaderData?.partnership
-  console.log("Partnership: " + (partnership != null));
+  //console.log("Partnership: " + (partnership != null));
   if (partnership != null && partnership.isActive === true) {
   
     const title = partnership?.title
@@ -162,7 +162,7 @@ export default function Index() {
     }, [discountId]);
 
     const generateDiscount = () => {
-      console.log('Action button clicked.')
+      //console.log('Action button clicked.')
       submit({}, { replace: true, method: "POST" })
     };
 
@@ -170,9 +170,16 @@ export default function Index() {
       <Page>
         <ui-title-bar title="Adelfi">
           <></>
-          <button variant="primary" onClick={generateDiscount} disabled={partnership.discountId != null}>
-            Activate Partnership
-          </button>
+          {partnership.discountId != null ? (
+            <></>
+            /*<button variant="primary" onClick={generateDiscount} disabled>
+              Activate Partnership
+            </button>*/
+          ):
+            <button variant="primary" onClick={generateDiscount}>
+              Activate Partnership
+            </button>
+          }
         </ui-title-bar>
         <VerticalStack gap="5">
           <Layout>
@@ -230,49 +237,47 @@ export default function Index() {
                         </pre>
                       </Box>
                     )}
-                    {partnership.discountId != null ? (
-                      <VerticalStack gap="2">
-                        <Text as="h3" variant="headingMd">
-                          Usage
-                        </Text>
-                        <HorizontalStack gap="3" align="center">
-                          <Box
-                            padding="4"
-                            background="bg-subdued"
-                            borderColor="border"
-                            borderWidth="1"
-                            borderRadius="2"
-                            width="25%"
-                          >
-                            <VerticalStack gap="2">
-                              <Text as="h1" variant="headingMd" alignment="center">
-                                Net Sales (All Time)
-                              </Text>
-                              <Text as="h1" variant="headingMd" alignment="center">
-                                ${partnership.totalSales.toFixed(2)} USD
-                              </Text>
-                            </VerticalStack>
-                          </Box>
-                          <Box
-                            padding="4"
-                            background="bg-subdued"
-                            borderColor="border"
-                            borderWidth="1"
-                            borderRadius="2"
-                            width="25%"
-                          >
-                            <VerticalStack gap="2">
-                              <Text as="h1" variant="headingMd" alignment="center">
-                                Commission (Monthly)
-                              </Text>
-                              <Text as="h1" variant="headingMd" alignment="center">
-                                ${(Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2)} USD
-                              </Text>
-                            </VerticalStack>
-                          </Box>
-                        </HorizontalStack>
-                      </VerticalStack>
-                    ) : (<></>)}
+                    <VerticalStack gap="2">
+                      <Text as="h3" variant="headingMd">
+                        Usage
+                      </Text>
+                      <HorizontalStack gap="3" align="center">
+                        <Box
+                          padding="4"
+                          background="bg-subdued"
+                          borderColor="border"
+                          borderWidth="1"
+                          borderRadius="2"
+                          width="25%"
+                        >
+                          <VerticalStack gap="2">
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              Net Sales (All Time)
+                            </Text>
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              ${partnership.discountId != null ? partnership.totalSales.toFixed(2) : 0} USD
+                            </Text>
+                          </VerticalStack>
+                        </Box>
+                        <Box
+                          padding="4"
+                          background="bg-subdued"
+                          borderColor="border"
+                          borderWidth="1"
+                          borderRadius="2"
+                          width="25%"
+                        >
+                          <VerticalStack gap="2">
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              Commission (Monthly)
+                            </Text>
+                            <Text as="h1" variant="headingMd" alignment="center">
+                              ${partnership.discountId != null ? (Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2) : 0} USD
+                            </Text>
+                          </VerticalStack>
+                        </Box>
+                      </HorizontalStack>
+                    </VerticalStack>
                     <VerticalStack gap="2">
                       <Text as="h3" variant="headingMd">
                         Terms
@@ -482,7 +487,7 @@ export default function Index() {
 async function subscribeToBulkOperationsWebhook(admin) {
   const existingWebhook = await isExistingWebhook(admin);
   if (existingWebhook != null) {
-      console.log("Bulk Operations Webhook is already subscribed")
+      //console.log("Bulk Operations Webhook is already subscribed")
       return existingWebhook;
   }
   const response = await admin.graphql(
@@ -510,10 +515,10 @@ async function subscribeToBulkOperationsWebhook(admin) {
     }
   ); 
   const responseJson = await response.json()
-  console.log(responseJson.data.webhookSubscriptionCreate)
-  console.log(responseJson.data.webhookSubscriptionCreate.userErrors.message)
+  //console.log(responseJson.data.webhookSubscriptionCreate)
+  //console.log(responseJson.data.webhookSubscriptionCreate.userErrors.message)
   const webhookId = responseJson.data.webhookSubscriptionCreate.webhookSubscription.id;
-  console.log("Webhook Created: " + webhookId)
+  //console.log("Webhook Created: " + webhookId)
   return webhookId
 }
 
@@ -540,19 +545,19 @@ async function isExistingWebhook(admin) {
   );
 
   const responseJson = await response.json();
-  console.log("responseJson.webhookSubscriptions.edges[0].node.id: " + responseJson.data.webhookSubscriptions.edges[0].node.id)
+  //console.log("responseJson.webhookSubscriptions.edges[0].node.id: " + responseJson.data.webhookSubscriptions.edges[0].node.id)
   if (responseJson.data.webhookSubscriptions.edges == null) {
     return null
   }
   let existingWebhookId = null;
   for (let i = 0; i < responseJson.data.webhookSubscriptions.edges.length; i++) {
     const topic = responseJson.data.webhookSubscriptions.edges[i].node.topic
-    console.log("topic: " + topic);
+    //console.log("topic: " + topic);
     if (topic == "BULK_OPERATIONS_FINISH") {
       const id = responseJson.data.webhookSubscriptions.edges[i].node.id
-      console.log("id: " + id);
+      //console.log("id: " + id);
       const callbackUrl = responseJson.data.webhookSubscriptions.edges[i].node.endpoint.callbackUrl
-      console.log("callbackUrl: " + callbackUrl);
+      //console.log("callbackUrl: " + callbackUrl);
       if (callbackUrl.substring(callbackUrl.lastIndexOf("/")) == "/processBulkOrders") {
         existingWebhookId = id
       } else {
@@ -584,7 +589,7 @@ async function deleteExistingWebhook(admin, id) {
 
   const responseJson = await response.json();
   const deletedSubscriptionId = responseJson?.webhookSubscriptionDelete?.deletedWebhookSubscriptionId;
-  console.log("DELETED webhook subscription: " + deletedSubscriptionId)
+  //console.log("DELETED webhook subscription: " + deletedSubscriptionId)
   return deletedSubscriptionId;
 }
 
@@ -606,7 +611,7 @@ async function sendEmailToServer(shop, content, hasAttachment) {
 
     if (response.ok) {
       const result = await response.json();
-      console.log('Email sent:', result);
+      //console.log('Email sent:', result);
     } else {
       console.error('Email sending failed:', response.statusText);
     }
@@ -629,7 +634,7 @@ async function queryCurrentBulkOperation(admin) {
   );
 
   const responseJson = await response.json();
-  console.log("responseJson: " + JSON.stringify(responseJson))
+  //console.log("responseJson: " + JSON.stringify(responseJson))
   if (responseJson.data.currentBulkOperation.id == null) {
     return null
   }
@@ -655,6 +660,6 @@ async function cancelBulkOperation(admin, id) {
 
   const responseJson = await response.json();
   const cancelledOperationId = responseJson?.data?.bulkOperationCancel.bulkOperation.id;
-  console.log("CANCELLED bulk operation: " + cancelledOperationId)
+  //console.log("CANCELLED bulk operation: " + cancelledOperationId)
   return cancelledOperationId;
 }

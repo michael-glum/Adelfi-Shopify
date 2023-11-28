@@ -15,11 +15,10 @@ const { startOfMonth } = require('date-fns');
 
 const PRIVATE_AUTH_TOKEN = process.env.PRIVATE_AUTH_TOKEN;
 //const EMAIL_PASS = process.env.EMAIL_PASS;
-const ORDER_GRACE_PERIOD = 1;
+const ORDER_GRACE_PERIOD = 31;
 const UPDATE_SALES_TASK = "UPDATE_SALES"
 const COLLECT_COMMISSIONS_TASK = "COLLECT_COMMISSIONS"
 
-// yighay
 export const action = async ({ request }) => {
     if (request.method === "POST") {
         const { token, task } = await request.json();
@@ -163,7 +162,7 @@ async function collectCommissions(partnership, admin) {
   const emailResponse = await sendEmail(partnership.shop.split(".")[0], currSales, false)
   console.log("Email response:", JSON.stringify(emailResponse));
 
-  if (true) {//((new Date()).getMonth() === partnership.expires.getMonth()) {
+  if ((new Date()).getMonth() === partnership.expires.getMonth()) {
     if (partnership.autoRenew === true) {
       // Generate new codes
       const codesArray = generateCodesArray();

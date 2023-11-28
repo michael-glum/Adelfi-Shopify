@@ -10,17 +10,20 @@ export const action = async ({ request }) => {
       if (session) {
         await db.session.deleteMany({ where: { shop } });
       }
-      break;
+      throw new Response("Session deleted", { status: 200 });
     case "CUSTOMERS_DATA_REQUEST":
+      throw new Response("Data not found", { status: 200 });
     case "CUSTOMERS_REDACT":
+      throw new Response("Data not found", { status: 200 });
     case "SHOP_REDACT":
-    /*case "BULK_OPERATIONS_FINISH":
-      console.log("Bulk Operations Finished")
-      const operationId = request.admin_graphql_api_id*/
+      if (shop) {
+        await db.partnership.deleteMany({ where: { shop } });
+      }
+      throw new Response("Store data erased", { status: 200 });
     default:
       console.log("Unhandled webhook topic")
       throw new Response("Unhandled webhook topic", { status: 404 });
   }
 
-  throw new Response();
+  //throw new Response();
 };
