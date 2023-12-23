@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { json } from "@remix-run/node";
 import { useActionData, useNavigation, useSubmit, useLoaderData } from "@remix-run/react";
 import {
@@ -132,6 +132,57 @@ function DiscountDetailsTable({ title, percentOff, usageLimit, commission, endDa
   );
 };
 
+const DiscountDetails = ({ title, percentOff, usageLimit, commission, endDateFormatted }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const discountData = {
+    'Discount Title': title,
+    'Number of Codes': NUM_CODES,
+    'Percent Off': Math.floor(percentOff * 100) + "%",
+    'Usage Limit': usageLimit,
+    'Commission Rate': commission,
+    'Next Period': endDateFormatted,
+  };
+
+  const renderMobileLayout = () => {
+    return Object.entries(discountData).map(([key, value]) => (
+      <Card key={key}>
+        <VerticalStack>
+          <Text as="h4">{key}</Text>
+          <Text as="h5">{value}</Text>
+        </VerticalStack>
+      </Card>
+    ));
+  };
+
+  const renderDesktopTable = () => {
+    return DiscountDetailsTable({ title, percentOff, usageLimit, commission, endDateFormatted })
+  };
+
+  return (
+    <div>
+      {isMobile ? (
+        <VerticalStack>{renderMobileLayout()}</VerticalStack>
+      ) : (
+        renderDesktopTable()
+      )}
+    </div>
+  );
+};
+
 export default function Index() {
   const nav = useNavigation();
   const actionData = useActionData();
@@ -199,7 +250,7 @@ export default function Index() {
                       <Text as="h3" variant="headingMd">
                         Partnership Details
                       </Text>
-                      <DiscountDetailsTable title={title} percentOff={percentOff} usageLimit={usageLimit} commission={commission} endDateFormatted={expires}/>
+                      <DiscountDetails title={title} percentOff={percentOff} usageLimit={usageLimit} commission={commission} endDateFormatted={expires}/>
                       <Text as="p" variant="bodyMd" alignment="center">
                         All codes are generated automatically and sent to our marketing team at Adelfi for distribution.
                       </Text>
@@ -242,14 +293,7 @@ export default function Index() {
                         Usage
                       </Text>
                       <HorizontalStack gap="3" align="center">
-                        <Box
-                          padding="4"
-                          background="bg-subdued"
-                          borderColor="border"
-                          borderWidth="1"
-                          borderRadius="2"
-                          width="25%"
-                        >
+                        <ResponsiveBox>
                           <VerticalStack gap="2">
                             <Text as="h1" variant="headingMd" alignment="center">
                               Net Sales (All Time)
@@ -258,15 +302,8 @@ export default function Index() {
                               ${partnership.discountId != null ? partnership.totalSales.toFixed(2) : 0} USD
                             </Text>
                           </VerticalStack>
-                        </Box>
-                        <Box
-                          padding="4"
-                          background="bg-subdued"
-                          borderColor="border"
-                          borderWidth="1"
-                          borderRadius="2"
-                          width="25%"
-                        >
+                        </ResponsiveBox>
+                        <ResponsiveBox>
                           <VerticalStack gap="2">
                             <Text as="h1" variant="headingMd" alignment="center">
                               Commission (Monthly)
@@ -275,7 +312,7 @@ export default function Index() {
                               ${partnership.discountId != null ? (Math.floor(partnership.currSales * partnership.commission * 100) / 100).toFixed(2) : 0} USD
                             </Text>
                           </VerticalStack>
-                        </Box>
+                        </ResponsiveBox>
                       </HorizontalStack>
                     </VerticalStack>
                     <VerticalStack gap="2">
@@ -663,3 +700,44 @@ async function cancelBulkOperation(admin, id) {
   //console.log("CANCELLED bulk operation: " + cancelledOperationId)
   return cancelledOperationId;
 }
+
+const ResponsiveBox = ({ children }) => {
+  // State for the current width of the box
+  const [boxWidth, setBoxWidth] = useState('25%');
+
+  // Effect to update the width based on the window size
+  useEffect(() => {
+    // Handler to call on window resize
+    function handleResize() {
+      // Set the box width to 50% if the window width is less than or equal to 768px
+      if (window.innerWidth <= 768) {
+        setBoxWidth('50%');
+      } else {
+        // Otherwise, set it to 25%
+        setBoxWidth('25%');
+      }
+    }
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Call handler right away so state gets updated with initial window size
+    handleResize();
+
+    // Remove event listener on cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return (
+    <Box
+      padding="4"
+      background="bg-subdued"
+      borderColor="border"
+      borderWidth="1"
+      borderRadius="2"
+      width="boxWidth" // Set the width based on the state
+    >
+      {children}
+    </Box>
+  );
+};

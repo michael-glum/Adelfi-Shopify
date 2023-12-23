@@ -40,7 +40,7 @@ exec:
 # These environment variables will be available in your Fly.io application.
 lease:
   type: "consul"
-  advertise-url: "http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202"
+  advertise-url: "http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202" #"http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202"
   candidate: ${FLY_REGION == PRIMARY_REGION}
   #promote: true
 

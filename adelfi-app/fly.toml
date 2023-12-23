@@ -26,10 +26,10 @@ primary_region = "iad"
 
 [[services]]
   internal_port = 8080
-  processess = ["app"]
+  procesess = ["app"]
   protocol = "tcp"
   auto_stop_machines = true
-  auto_start_machines = true
+  auto_start_machines = false
   min_machines_running = 1
 
   [[services.ports]]
