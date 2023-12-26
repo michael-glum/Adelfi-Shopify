@@ -2,6 +2,7 @@
 
 set -ex
 
+npx prisma generate
 npx prisma migrate deploy
 
 # Check if it's the initial deployment

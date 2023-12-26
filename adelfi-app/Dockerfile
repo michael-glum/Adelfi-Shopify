@@ -1,18 +1,32 @@
 FROM node:18-alpine
 
-EXPOSE 8081
+# Install bash
+RUN apk add --no-cache bash
+
+EXPOSE 8080
 WORKDIR /app
 COPY . .
 
-ARG LITEFS_CONFIG=litefs.yml
+# Make sure the script is executable
+RUN chmod +x ./start_with_migrations.sh
 
-COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
+#ARG LITEFS_CONFIG=litefs.yml
 
-ADD etc/litefs.yml /tmp/litefs.yml
+#COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
 
-RUN cp /tmp/$LITEFS_CONFIG /etc/litefs.yml
+#ADD etc/litefs.yml /tmp/litefs.yml
 
-RUN apk add bash fuse3 sqlite ca-certificates curl
+#RUN cp /tmp/$LITEFS_CONFIG /etc/litefs.yml
+
+#RUN apk add bash fuse3 sqlite ca-certificates curl
+
+# Copy certificate file into the container
+COPY ca.pem /usr/local/share/ca-certificates/ca.pem
+
+# Update the certificates
+RUN apk update && \
+    apk add --no-cache ca-certificates && \
+    update-ca-certificates
 
 RUN npm install
 RUN npm run build
@@ -20,6 +34,6 @@ RUN npm run build
 # You'll probably want to remove this in production, it's here to make it easier to test things!
 RUN rm -f prisma/dev.sqlite
 
-ENTRYPOINT litefs mount
+#ENTRYPOINT litefs mount
 
-# CMD ["npm", "run", "docker-start"]
+CMD ["./start_with_migrations.sh"]

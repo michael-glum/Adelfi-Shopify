@@ -6,37 +6,40 @@
 app = "adelfi"
 primary_region = "iad"
 
-[experimental]
-  enable_consul = true
-
 [build]
 
 [env]
-  DATABASE_URL = "file:app/prisma/litefs/sqlite.db"
-  INITIAL_DEPLOYMENT = "false"
-  PORT = "8081"
-  SCOPES = "write_discounts, read_orders"
+  PORT = "8080"
   SHOPIFY_API_KEY = "5e08fea9e792973c455f4c456965173a"
   SHOPIFY_APP_URL = "https://adelfi.fly.dev"
-  DEFER_TOKEN = "BNKwjF5EP5MeP_ZZU-TjjnSt3QA8d9Pwkoc9--5gEdHD2RiG6saOrp45X1zATOKv"
+  SCOPES = "write_discounts, read_orders"
+  INITIAL_DEPLOYMENT = "false"
 
 [mounts]
-  source = "litefs"
-  destination = "/var/lib/litefs"
+ source = "litefs"
+ destination = "/var/lib/litefs"
 
-[[services]]
+[http_service]
   internal_port = 8080
-  procesess = ["app"]
-  protocol = "tcp"
+  force_https = true
   auto_stop_machines = true
-  auto_start_machines = false
+  auto_start_machines = true
   min_machines_running = 1
+  processes = ["app"]
 
-  [[services.ports]]
-    force_https = true
-    handlers = ["http"]
-    port = 80
-
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
+# [[services]]
+#   internal_port = 8080
+#   procesess = ["app"]
+#   protocol = "tcp"
+#   auto_stop_machines = true
+#   auto_start_machines = false
+#   min_machines_running = 1
+# 
+#   [[services.ports]]
+#     force_https = true
+#     handlers = ["http"]
+#     port = 80
+# 
+#   [[services.ports]]
+#     handlers = ["tls", "http"]
+#     port = 443

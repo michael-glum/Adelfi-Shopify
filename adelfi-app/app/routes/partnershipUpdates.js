@@ -33,37 +33,41 @@ export const action = async ({ request }) => {
             const today = await getDateXDaysAgo(0);
 
             updateResponses.push(partnerships.forEach(async function(partnership) {
-                if (partnership.lastUpdated != today || task === COLLECT_COMMISSIONS_TASK) {
-                    const { admin } = await unauthenticated.admin(partnership.shop);
-                    // If the partnership isn't active, make sure the discount codes are deleted, and no additional processing is done
-                    if (partnership.isActive === false) {
-                        if (partnership.discountId != null) {
-                            const response = deleteBulkDiscountCodes(admin, partnership.discountId)
-                            console.log("Delete codes response: " + response)
-                            partnership.discountId = null;
-                            partnership.codes = null;
-                            const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
-                            if (updateResponse.count === 0) {
-                                console.error("Error: Couldn't update partnership.currSales in db for shop: " + partnership.shop);
-                                return null;
-                            } else {
-                                console.log("Partnership db currSales updated for shop: " + partnership.shop);
-                            }
-                        }
-                        return null;
-                    }
-                    if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
-                        if (task === UPDATE_SALES_TASK) {
-                          const bulkOpResponse = await queryOrdersBulkOperation(admin);
-                          console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
-                        } else if (task === COLLECT_COMMISSIONS_TASK) {
-                          await collectCommissions(partnership, admin);
-                        }
-                    } else {
-                        console.log("No discountId attached to this shop: " + partnership.shop)
-                    }
-                } else {
-                  console.log("Commission already calculated today for: " + partnership.shop);
+                try {
+                  if (partnership.lastUpdated != today || task === COLLECT_COMMISSIONS_TASK) {
+                      const { admin } = await unauthenticated.admin(partnership.shop);
+                      // If the partnership isn't active, make sure the discount codes are deleted, and no additional processing is done
+                      if (partnership.isActive === false) {
+                          if (partnership.discountId != null) {
+                              const response = deleteBulkDiscountCodes(admin, partnership.discountId)
+                              console.log("Delete codes response: " + response)
+                              partnership.discountId = null;
+                              partnership.codes = null;
+                              const updateResponse = await db.partnership.updateMany({ where: { shop: partnership.shop}, data: { ...partnership }})
+                              if (updateResponse.count === 0) {
+                                  console.error("Error: Couldn't update partnership.currSales in db for shop: " + partnership.shop);
+                                  return null;
+                              } else {
+                                  console.log("Partnership db currSales updated for shop: " + partnership.shop);
+                              }
+                          }
+                          return null;
+                      }
+                      if (partnership.discountId != null && partnership.totalSales != null && partnership.currSales != null) {
+                          if (task === UPDATE_SALES_TASK) {
+                            const bulkOpResponse = await queryOrdersBulkOperation(admin);
+                            console.log("Bulk Operation Response Status: " + JSON.stringify(bulkOpResponse))
+                          } else if (task === COLLECT_COMMISSIONS_TASK) {
+                            await collectCommissions(partnership, admin);
+                          }
+                      } else {
+                          console.log("No discountId attached to this shop: " + partnership.shop)
+                      }
+                  } else {
+                    console.log("Commission already calculated today for: " + partnership.shop);
+                  }
+                } catch (error) {
+                  console.error(`Error updating ${partnership.shop}:`, error);
                 }
             }));
             return json({updateResponses: updateResponses})
