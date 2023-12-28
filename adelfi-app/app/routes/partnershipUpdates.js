@@ -23,7 +23,7 @@ export const action = async ({ request }) => {
     if (request.method === "POST") {
         const { token, task } = await request.json();
         if (token === PRIVATE_AUTH_TOKEN) {
-            console.log("Noooo")
+            // console.log("Noooo")
             const partnerships = await db.partnership.findMany();
             if (!partnerships) {
                 return json({ message: 'Partnerships not found' }, { status: 404 });
