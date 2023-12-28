@@ -6,6 +6,11 @@ export async function getPartnership(shop, graphql) {
     if (!partnership || !partnership.isActive) {
         return null
     }
+    
+    if (!partnership.isInstalled) {
+      await db.partnership.updateMany({ where: { shop: shop }, data: { isInstalled: true } });
+      partnership.isInstalled = true;
+    }
 
     return (partnership.discountId == null) ? partnership : await supplementPartnership(partnership, graphql, shop);
 }

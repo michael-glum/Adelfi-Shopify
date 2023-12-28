@@ -34,7 +34,7 @@ export const action = async ({ request }) => {
 
             updateResponses.push(partnerships.forEach(async function(partnership) {
                 try {
-                  if (partnership.lastUpdated != today || task === COLLECT_COMMISSIONS_TASK) {
+                  if (partnership.isInstalled && (partnership.lastUpdated != today || task === COLLECT_COMMISSIONS_TASK)) {
                       const { admin } = await unauthenticated.admin(partnership.shop);
                       // If the partnership isn't active, make sure the discount codes are deleted, and no additional processing is done
                       if (partnership.isActive === false) {

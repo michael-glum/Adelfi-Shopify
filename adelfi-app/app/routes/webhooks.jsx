@@ -10,6 +10,9 @@ export const action = async ({ request }) => {
       if (session) {
         await db.session.deleteMany({ where: { shop } });
       }
+      if (shop) {
+        await db.partnership.updateMany({ where: { shop: shop }, data: { isInstalled: false } })
+      }
       throw new Response("Session deleted", { status: 200 });
     case "CUSTOMERS_DATA_REQUEST":
       throw new Response("Data not found", { status: 200 });
