@@ -13,7 +13,7 @@ primary_region = "iad"
   SHOPIFY_API_KEY = "5e08fea9e792973c455f4c456965173a"
   SHOPIFY_APP_URL = "https://adelfi.fly.dev"
   SCOPES = "write_discounts, read_orders"
-  INITIAL_DEPLOYMENT = "false"
+  INITIAL_DEPLOYMENT = "true"
 
 [mounts]
  source = "litefs"

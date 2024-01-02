@@ -38,5 +38,5 @@ model Partnership {
   webhookId   String?
   lastUpdated String?
   lastPayment Float?
-  isInstalled Boolean   @default(true)
+  isInstalled Boolean   @default(false)
 }

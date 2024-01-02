@@ -35,10 +35,18 @@ const BASE_URL = "https://adelfi.fly.dev/";
 
 export const loader = async ({ request }) => {
   const { billing, admin, session } = await authenticate.admin(request);
+  const { shop } = session;
+
+  const isDevelopmentStore = (shop === 'quickstart-9f306b3f.myshopify.com');
+
   await billing.require({
     plans: [ONE_TIME_PURCHASE],
     isTest: true,
-    onFailure: async () => billing.request({ plan: ONE_TIME_PURCHASE }),
+    onFailure: async () => billing.request({
+      plan: ONE_TIME_PURCHASE,
+      isTest: true,
+      returnUrl: "https://admin.shopify.com/apps/adelfi-app-3",
+    }),
   });
 
   const partnership = await getPartnership(session.shop, admin.graphql)
