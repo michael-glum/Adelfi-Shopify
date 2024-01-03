@@ -37,7 +37,7 @@ async function seedDatabase() {
     });*/
     await prisma.partnership.create({
       data: {
-        id: '1',
+        id: '2',
         shop: 'ronnies-drummer.myshopify.com',
         title: '25% Off With Adelfi',
         usageLimit: 500,
